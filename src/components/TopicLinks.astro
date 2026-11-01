@@ -1,0 +1,28 @@
+---
+import { href } from '../data/routes.mjs';
+import { searchMeta } from '../data/search-meta.mjs';
+const { id, lang='en' }=Astro.props;
+const fr=lang==='fr';
+const destinations = {
+  plans:['iptv-cost-usa','multi-device-iptv-usa','choose-iptv'],
+  devices:['iptv-setup-usa','iptv-buffering-usa','multi-device-iptv-usa'],
+  channels:['french-tv-usa','iptv-setup-usa','faq'],
+  sports:['iptv-buffering-usa','multi-device-iptv-usa','test-connection'],
+  vod:['iptv-setup-usa','multi-device-iptv-usa','faq'],
+  trial:['test-connection','iptv-setup-usa','faq'],
+  contact:['plans','faq','devices'],
+  faq:['iptv-cost-usa','iptv-setup-usa','iptv-buffering-usa'],
+  'choose-iptv':['iptv-cost-usa','multi-device-iptv-usa','trial'],
+  'test-connection':['iptv-buffering-usa','iptv-setup-usa','trial'],
+  'iptv-vs-cable':['iptv-cost-usa','choose-iptv','plans'],
+  'french-tv-usa':['channels','vod','sports'],
+  'iptv-cost-usa':['plans','iptv-vs-cable','choose-iptv'],
+  'iptv-setup-usa':['devices','trial','iptv-buffering-usa'],
+  'iptv-buffering-usa':['test-connection','iptv-setup-usa','contact'],
+  'multi-device-iptv-usa':['plans','devices','test-connection']
+}[id] || [];
+---
+{destinations.length>0 && <section class="wrap topic-links" aria-labelledby="topic-links-heading"><span class="eyebrow">{fr?'LE PROCHAIN PAS UTILE':'YOUR NEXT USEFUL STEP'}</span><h2 id="topic-links-heading">{fr?'Approfondissez votre choix IPTV au United States':'Explore your IPTV USA setup further'}</h2><div>{destinations.map(route=><a href={href(route,lang)}><h3>{searchMeta[route][lang].h1}</h3><p>{searchMeta[route][lang].description}</p><span>{fr?'Voir les détails':'See the details'} →</span></a>)}</div></section>}
+<style>
+.topic-links{padding-block:38px 65px}.topic-links h2{font-size:clamp(27px,3vw,38px);line-height:1.2;margin-block:12px 26px}.topic-links>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}.topic-links a{display:flex;flex-direction:column;padding:26px;background:#f6f7fa;border:1px solid #e2e6ec;border-radius:14px}.topic-links h3{font-size:21px;line-height:1.25}.topic-links p{font-size:13px;line-height:1.8;margin-block:16px 22px}.topic-links a>span{margin-top:auto;font-size:12px;font-weight:800;color:#aa2337}@media(max-width:760px){.topic-links>div{grid-template-columns:1fr}.topic-links{padding-block:25px 45px}}
+</style>

@@ -1,0 +1,68 @@
+---
+import { catalog } from '../data/catalog';
+import type { CatalogId, CatalogLocale } from '../data/catalog';
+import { href } from '../data/routes.mjs';
+import { generatorUrl } from '../data/generator.mjs';
+interface Props { id: CatalogId; lang: CatalogLocale }
+const { id, lang } = Astro.props;
+const page = catalog[id][lang];
+const fr = lang === 'fr';
+---
+<div class="wrap catalog-content">
+  <figure class="catalog-visual"><img src={id==='sports'?'/images/iptv-usa-8k-sports.webp':id==='vod'?'/images/iptv-usa-8k-cinema.webp':'/images/iptv-usa-8k-dashboard.webp'} width={id==='channels'?1600:1200} height={id==='channels'?900:675} alt={fr?'Montage promotionnel IPTV USA 8K de chaînes américaines, de sports et de cinéma':'IPTV USA 8K promotional collage of American channels, sports and cinema'} loading="lazy"/><figcaption>{fr?'Visuel promotionnel illustratif. Chaînes et titres selon disponibilité; vérifiez pendant votre essai.':'Illustrative promotional artwork. Channels and titles are subject to availability; check during your trial.'}</figcaption></figure>
+  <div class="catalog-start">
+    <ul class="catalog-highlights" aria-label={fr ? 'Sur cette page' : 'On this page'}>
+      {page.highlights.map(text => <li><span aria-hidden="true">✓</span>{text}</li>)}
+    </ul>
+    <a class="button" href={generatorUrl(lang)} data-open-trial>{fr ? 'Ouvrir le générateur d’essai' : 'Open the trial generator'} <span aria-hidden="true">↗</span></a>
+  </div>
+
+  <div class="catalog-layout">
+    <aside class="catalog-toc">
+      <p class="eyebrow">{fr ? 'VOTRE PARCOURS' : 'YOUR VIEWING CHECKLIST'}</p>
+      <nav aria-label={fr ? 'Sommaire de la page' : 'Page contents'}>
+        {page.sections.map((section, i) => <a href={`#${id}-section-${i + 1}`}>{section.heading}</a>)}
+      </nav>
+      <a class="text-link" href={href('plans', lang)}>{fr ? 'Comparer les abonnements' : 'Compare subscriptions'} →</a>
+    </aside>
+
+    <article class="catalog-article">
+      {page.sections.map((section, i) => <>
+        <section id={`${id}-section-${i + 1}`} class="catalog-section">
+          <span class="catalog-index" aria-hidden="true">0{i + 1}</span>
+          <h2>{section.heading}</h2>
+          {section.paragraphs.map(paragraph => <p>{paragraph}</p>)}
+          {section.bullets && <ul>{section.bullets.map(item => <li>{item}</li>)}</ul>}
+        </section>
+        {i === 1 && <section class="catalog-table-section">
+          <h2>{page.table.heading}</h2>
+          <div class="catalog-table-scroll" role="region" aria-label={page.table.heading} tabindex="0">
+            <table>
+              <caption>{page.table.caption}</caption>
+              <thead><tr>{page.table.columns.map(column => <th scope="col">{column}</th>)}</tr></thead>
+              <tbody>{page.table.rows.map(row => <tr>{row.map((cell, index) => index === 0 ? <th scope="row">{cell}</th> : <td>{cell}</td>)}</tr>)}</tbody>
+            </table>
+          </div>
+        </section>}
+      </>)}
+
+      <section class="catalog-faq">
+        <h2>{fr ? 'Questions avant de choisir' : 'Questions before you choose'}</h2>
+        {page.faq.map(item => <details><summary><h3>{item.q}</h3><span aria-hidden="true">+</span></summary><p>{item.a}</p></details>)}
+      </section>
+    </article>
+  </div>
+
+  <section class="catalog-cta">
+    <div><span class="eyebrow">{fr ? 'VOTRE PROCHAINE ÉTAPE' : 'YOUR NEXT STEP'}</span><h2>{page.ctaHeading}</h2><p>{page.ctaBody}</p></div>
+    <div class="catalog-cta-actions"><a class="button" href={generatorUrl(lang)} data-open-trial>{fr ? 'Ouvrir le générateur' : 'Open the generator'} ↗</a><a class="button button-secondary" href={href('plans', lang)}>{fr ? 'Voir les abonnements' : 'View subscription plans'} →</a></div>
+  </section>
+  <nav class="catalog-related" aria-label={fr ? 'Pour poursuivre votre choix' : 'Continue choosing your setup'}>
+    {page.related.map(link => <a href={href(link.id, lang)}>{link.label}<span aria-hidden="true">↗</span></a>)}
+  </nav>
+</div>
+
+<style>
+  .catalog-visual{max-width:880px;margin:0 auto 30px;border-radius:16px;overflow:hidden;background:#121722}.catalog-visual img{width:100%;height:auto;max-height:460px;object-fit:cover}.catalog-visual figcaption{color:#b7c2d5;font-size:10px;padding:12px 18px}
+  .catalog-content{padding-bottom:65px}.catalog-start{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:20px 0 40px;border-bottom:1px solid var(--line)}.catalog-highlights{list-style:none;display:flex;flex-wrap:wrap;gap:14px 25px;padding:0;margin:0;font-size:13px;font-weight:600}.catalog-highlights li{margin:0;display:flex;align-items:center;gap:9px}.catalog-highlights span{color:var(--red)}.catalog-start .button{flex-shrink:0}.catalog-layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:70px;padding-top:55px}.catalog-toc{align-self:start;position:sticky;top:115px}.catalog-toc .eyebrow{font-size:10px;letter-spacing:.1em}.catalog-toc nav{display:flex;flex-direction:column;gap:15px}.catalog-toc nav a{font-size:13px;line-height:1.6;color:var(--muted)}.catalog-toc nav a:hover{color:var(--red)}.catalog-toc .text-link{margin-top:30px;font-size:12px;color:var(--red)}.catalog-article{max-width:850px;min-width:0}.catalog-section{position:relative;margin-bottom:48px;scroll-margin-top:120px}.catalog-section h2,.catalog-table-section h2,.catalog-faq>h2{font-size:clamp(1.65rem,2.3vw,2.25rem);line-height:1.3;letter-spacing:-.035em;margin-bottom:20px}.catalog-section p{font-size:16px;line-height:1.9}.catalog-section ul{font-size:15px;line-height:1.8;color:var(--muted)}.catalog-index{display:block;font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--red);margin-bottom:12px}.catalog-table-section{margin:12px 0 50px;padding:28px;background:var(--cream);border-radius:12px}.catalog-table-section h2{font-size:25px}.catalog-table-scroll{overflow-x:auto;max-width:100%}.catalog-table-scroll table{border-collapse:collapse;min-width:560px;width:100%;text-align:left;font-size:13px;line-height:1.7}.catalog-table-scroll caption{text-align:left;font-size:12px;color:var(--muted);padding:0 0 18px;caption-side:top}.catalog-table-scroll th,.catalog-table-scroll td{padding:13px 12px;vertical-align:top;border-bottom:1px solid var(--line)}.catalog-table-scroll thead th{font-size:11px;letter-spacing:.03em;color:var(--red);border-top:1px solid var(--line)}.catalog-table-scroll tbody th{width:24%;font-weight:650}.catalog-table-scroll tbody td{color:var(--muted)}.catalog-faq{margin-top:45px}.catalog-faq details{border-bottom:1px solid var(--line);padding:20px 0}.catalog-faq summary{display:flex;justify-content:space-between;align-items:center;gap:20px;cursor:pointer;list-style:none}.catalog-faq summary::-webkit-details-marker{display:none}.catalog-faq summary h3{font-size:17px;line-height:1.5;letter-spacing:-.02em}.catalog-faq summary>span{font-size:24px;color:var(--red)}.catalog-faq details[open] summary>span{transform:rotate(45deg)}.catalog-faq p{font-size:15px;line-height:1.9;margin-top:15px}.catalog-cta{margin-top:65px;background:var(--ink);color:white;padding:40px;border-radius:14px;display:grid;grid-template-columns:1fr auto;gap:40px;align-items:center}.catalog-cta .eyebrow{color:#f7b4aa;font-size:10px}.catalog-cta h2{font-size:30px;line-height:1.3;max-width:650px}.catalog-cta p{font-size:14px;line-height:1.8;color:#dedede;margin-top:18px;max-width:640px}.catalog-cta-actions{display:flex;flex-direction:column;gap:12px}.catalog-cta .button-secondary{border-color:#ffffff50;color:white}.catalog-cta .button-secondary:hover{background:#ffffff18}.catalog-related{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:22px}.catalog-related a{display:flex;align-items:center;justify-content:space-between;gap:20px;border:1px solid var(--line);padding:18px;border-radius:8px;font-size:12px;font-weight:600}.catalog-related a>span{color:var(--red);font-size:18px}@media(max-width:1050px){.catalog-start{align-items:flex-start;flex-direction:column}.catalog-layout{grid-template-columns:190px minmax(0,1fr);gap:35px}.catalog-cta{grid-template-columns:1fr;gap:25px}.catalog-cta-actions{flex-direction:row;flex-wrap:wrap}}@media(max-width:750px){.catalog-layout{grid-template-columns:1fr;gap:30px;padding-top:30px}.catalog-toc{position:static;border-bottom:1px solid var(--line);padding-bottom:25px}.catalog-toc nav{display:grid;grid-template-columns:1fr 1fr;gap:12px 20px}.catalog-toc .text-link{margin-top:20px}.catalog-section{margin-bottom:35px}.catalog-section h2{font-size:27px}.catalog-section p{font-size:15px}.catalog-table-section{padding:20px;margin-bottom:35px}.catalog-table-section h2{font-size:24px}.catalog-related{grid-template-columns:1fr}.catalog-cta{padding:28px;margin-top:40px}.catalog-cta h2{font-size:27px}}@media(max-width:420px){.catalog-toc nav{grid-template-columns:1fr}.catalog-highlights{gap:10px;font-size:12px}.catalog-section h2{font-size:25px}.catalog-cta-actions{flex-direction:column}.catalog-cta .button{width:100%}.catalog-cta{padding:24px}.catalog-table-section{padding:17px}.catalog-table-scroll table{font-size:12px}.catalog-start .button{width:100%}}
+</style>

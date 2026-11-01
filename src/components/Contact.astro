@@ -1,0 +1,54 @@
+---
+import { site } from '../data/site.mjs';
+import { generator } from '../data/generator.mjs';
+import { planDurations, screenOptions } from '../data/plan-options.mjs';
+import { supportWhatsAppUrl } from '../lib/plan-request.mjs';
+const { lang } = Astro.props;
+const fr=lang==='fr';
+const supportPhone=site.phone || generator.sharedSupportNumber;
+const available=Boolean(site.contactEndpoint || site.email || supportPhone);
+---
+<div class="contact-grid">
+  <div class="contact-direct"><span class="eyebrow">{fr?'ASSISTANCE IPTV USA':'IPTV USA SUPPORT'}</span><h2>{fr?'Parlez à l’équipe sur WhatsApp.':'Talk to the team on WhatsApp.'}</h2><p>{fr?'Essai gratuit, choix d’abonnement ou aide à l’installation : ouvrez la conversation et précisez votre appareil. Vous pouvez poser votre question sans remplir le formulaire.':'Free trial, subscription choice or setup help: open the conversation and tell us your device. You can ask your question without filling in a form.'}</p>
+    <a class="button contact-whatsapp" href={supportWhatsAppUrl(lang,supportPhone)} data-contact-whatsapp>{fr?'Ouvrir WhatsApp':'Open WhatsApp support'} ↗</a>
+    <p class="support-team-note">{fr?'Assistance IPTV USA 8K.':'IPTV USA 8K support.'} {fr?'Le message est préparé; vous choisissez de l’envoyer dans WhatsApp.':'The message is prefilled; you choose whether to send it in WhatsApp.'}</p>
+    <ul class="contact-help-topics"><li>{fr?'Demander un essai et vérifier l’expiration de votre accès.':'Ask about a trial and check your access expiry.'}</li><li>{fr?'Confirmer le tarif USD pour votre durée et vos écrans.':'Confirm the USD price for your duration and screens.'}</li><li>{fr?'Obtenir de l’aide pour Fire TV, Smart TV ou votre lecteur.':'Get help with Fire TV, Smart TV or your player.'}</li></ul>
+    {site.email && <a class="contact-method" href={`mailto:${site.email}`}>{site.email} ↗</a>}
+  </div>
+  <form id="enquiry-form" data-lang={lang} data-endpoint={site.contactEndpoint} data-email={site.email} data-phone={supportPhone}>
+    <h2>{fr?'Ajouter des détails à ma demande':'Add details to my enquiry'}</h2><p class="composer-intro">{fr?'Facultatif : préparez un message plus précis avant de l’ouvrir sur WhatsApp.':'Optional: prepare a more detailed message before opening it on WhatsApp.'}</p><p id="selected-plan-summary" class="notice" hidden role="status"></p>
+    <div class="field"><label for="months">{fr?'Durée souhaitée':'Preferred duration'}</label><select id="months" name="months"><option value="">{fr?'À choisir':'Not sure yet'}</option>{planDurations.map(n=><option value={n}>{n} {fr?'mois':n===1?'month':'months'}</option>)}<option value="custom">{fr?'Durée sur mesure':'Custom duration'}</option></select></div>
+    <div class="field"><label for="name">{fr?'Votre prénom':'First name'}</label><input id="name" name="name" autocomplete="given-name" maxlength="60" required/></div>
+    {site.contactEndpoint && <div class="field"><label for="reply-email">{fr?'Courriel pour recevoir une réponse':'Email for a reply'}</label><input id="reply-email" name="replyTo" type="email" autocomplete="email" maxlength="254" required/></div>}
+    <div class="form-row"><div class="field"><label for="device">{fr?'Votre appareil':'Your device'}</label><select id="device" name="device"><option>Smart TV</option><option>Fire TV</option><option>Android TV / Google TV</option><option>Apple TV / iPhone / iPad</option><option>{fr?'Ordinateur':'Computer'}</option><option>{fr?'Autre / à confirmer':'Other / not sure'}</option></select></div><div class="field"><label for="screens">{fr?'Écrans en même temps':'Screens at once'}</label><select id="screens" name="screens">{screenOptions.map(n=><option value={n}>{n}</option>)}<option value="7+">7+</option></select></div></div>
+    <div class="field"><label for="message">{fr?'Vos questions ou votre modèle':'Questions or device model'}</label><textarea id="message" name="message" rows="4" maxlength="2000" placeholder={fr?'Modèle de télé, langues, durée souhaitée…':'TV model, languages, preferred duration…'}></textarea></div>
+    <button class="button" type="submit" data-prepare-message disabled>{fr?'Préparer le message':'Prepare message'}<span aria-hidden="true">→</span></button><p class="form-note">{fr?'La préparation reste dans votre navigateur. Vous choisissez ensuite de transmettre le message.':'Preparation stays in your browser. You choose whether to send the message next.'}</p>
+    <div id="enquiry-result" hidden aria-live="polite"><label for="prepared-message">{fr?'Votre message':'Your message'}</label><textarea id="prepared-message" rows="7" readonly></textarea><div class="result-actions"><button type="button" class="button button-secondary" id="copy-message">{fr?'Copier':'Copy message'}</button><button type="button" class="text-link" id="download-message">{fr?'Télécharger':'Download'}</button>{available && <a id="send-message" class="button" hidden>{supportPhone?(fr?'Continuer sur WhatsApp':'Continue on WhatsApp'):(fr?'Continuer par courriel':'Continue by email')} ↗</a>}{site.contactEndpoint && <button class="button" type="button" id="submit-message">{fr?'Envoyer la demande':'Send enquiry'}</button>}</div><p id="form-status" role="status"></p></div>
+    <noscript><p>{fr?'Activez JavaScript pour préparer le message, ou utilisez les coordonnées affichées sur cette page.':'Enable JavaScript to prepare a message, or use the contact details shown on this page.'}</p></noscript>
+  </form>
+</div>
+<script>
+  import { parsePlanSelection, contactWhatsAppMessage } from '../lib/plan-request.mjs';
+  const form=document.querySelector<HTMLFormElement>('#enquiry-form');
+  if(form){
+    const fr=form.dataset.lang==='fr';
+    const selection=parsePlanSelection(window.location.search);
+    const monthsField=form.querySelector<HTMLSelectElement>('#months')!;
+    const screensField=form.querySelector<HTMLSelectElement>('#screens')!;
+    monthsField.value=selection.months;screensField.value=selection.screens;
+    const selectedSummary=form.querySelector<HTMLElement>('#selected-plan-summary')!;
+    const updateSummary=()=>{const duration=monthsField.value==='custom'?(fr?'durée sur mesure':'custom duration'):monthsField.value?`${monthsField.value} ${fr?'mois':monthsField.value==='1'?'month':'months'}`:(fr?'durée à choisir':'duration to choose');selectedSummary.hidden=false;selectedSummary.textContent=fr?`Votre demande : ${duration}, ${screensField.value} écran(s) simultané(s). Vous pouvez modifier ces choix.`:`Your request: ${duration}, ${screensField.value} simultaneous screen(s). You can change these choices.`;};
+    monthsField.addEventListener('change',updateSummary);screensField.addEventListener('change',updateSummary);if(selection.months)updateSummary();
+    const result=document.querySelector<HTMLElement>('#enquiry-result')!;const output=document.querySelector<HTMLTextAreaElement>('#prepared-message')!;const status=document.querySelector<HTMLElement>('#form-status')!;
+    form.addEventListener('submit',e=>{e.preventDefault();const data=new FormData(form); output.value=contactWhatsAppMessage(fr?'fr':'en',{name:String(data.get('name')||''),months:monthsField.value,screens:screensField.value,device:String(data.get('device')||''),message:String(data.get('message')||'')});result.hidden=false;status.textContent=fr?'Message préparé. Il n’a pas été envoyé.':'Message prepared. It has not been sent.';const send=document.querySelector<HTMLAnchorElement>('#send-message'); if(send&&(form.dataset.phone||form.dataset.email)){send.href=form.dataset.phone?`https://wa.me/${form.dataset.phone}?text=${encodeURIComponent(output.value)}`:`mailto:${form.dataset.email}?subject=${encodeURIComponent('IPTV USA 8K')}&body=${encodeURIComponent(output.value)}`;send.hidden=false;} output.focus();});
+    form.addEventListener('input',()=>{result.hidden=true;});
+    document.querySelector('#copy-message')?.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(output.value);status.textContent=fr?'Message copié.':'Message copied.';}catch{output.select();status.textContent=fr?'Sélectionnez et copiez le texte.':'Select and copy the text.';}});
+    document.querySelector('#download-message')?.addEventListener('click',()=>{const url=URL.createObjectURL(new Blob([output.value],{type:'text/plain;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='iptv-usa-8k-enquiry.txt';a.click();URL.revokeObjectURL(url);});
+    document.querySelector<HTMLButtonElement>('#submit-message')?.addEventListener('click',async e=>{if(!form.reportValidity())return;const btn=e.currentTarget as HTMLButtonElement;btn.disabled=true;const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),12000);try{const data=new FormData(form);const response=await fetch(form.dataset.endpoint!,{method:'POST',signal:controller.signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({name:data.get('name'),replyTo:data.get('replyTo'),device:data.get('device'),screens:data.get('screens'),months:data.get('months'),message:output.value,language:form.dataset.lang})});if(!response.ok)throw new Error();const acknowledgement=await response.json();if(acknowledgement.ok!==true)throw new Error();status.textContent=fr?'Votre demande a été transmise.':'Your enquiry has been submitted.';}catch{status.textContent=fr?'La réception n’a pas pu être confirmée. Conservez votre message; vous pouvez le copier ou réessayer.':'Receipt could not be confirmed. Keep your message; you can copy it or try again.';btn.disabled=false;}finally{clearTimeout(timeout);}});
+    form.querySelector<HTMLButtonElement>('[data-prepare-message]')!.disabled=false;
+  }
+</script>
+
+<style>
+.contact-direct .eyebrow{margin-bottom:18px}.contact-whatsapp{margin-top:26px;background:#176944;border-color:#176944}.contact-whatsapp:hover{background:#105036;border-color:#105036}.contact-direct .support-team-note{font-size:12px;line-height:1.8;margin-top:16px;max-width:440px}.contact-help-topics{font-size:14px;line-height:1.85;color:var(--muted);padding-left:20px;margin-top:26px}.composer-intro{font-size:13px;line-height:1.8;margin-block:12px 22px}@media(max-width:600px){.contact-whatsapp{width:100%;font-size:13px}.contact-help-topics{font-size:13px}}
+</style>

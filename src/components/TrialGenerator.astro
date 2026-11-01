@@ -1,0 +1,127 @@
+---
+import { generatorUrl, generatorSupportUrl } from '../data/generator.mjs';
+import { href } from '../data/routes.mjs';
+const { lang = 'en', mode = 'section' } = Astro.props;
+const fr = lang === 'fr';
+const url = generatorUrl(lang);
+const t = fr ? {
+  eyebrow: 'ESSAI IPTV USA 7 JOURS · RENOUVELLEMENT QUOTIDIEN',
+  heading: 'Générez votre essai IPTV. Testez avant de vous abonner.',
+  body: 'Ouvrez le générateur IPTV USA 8K, choisissez votre connexion et recevez vos identifiants d’essai. Testez les chaînes, le guide TV et la lecture sur votre appareil, avec votre connexion Internet au United States.',
+  cta: 'Générer mon essai gratuit',
+  support: 'Aide du service d’activation',
+  details: 'Le générateur utilise notre service d’activation partagé. Les disponibilités et limites s’affichent dans le formulaire. L’expiration exacte est indiquée dans votre lecteur.',
+  perks: ['Aucune carte bancaire', 'Aucun paiement automatique', 'Xtream Codes, M3U et boîtiers MAG'],
+  steps: [
+    ['Choisissez votre connexion', 'Appli ou Smart TV avec Xtream Codes et M3U, ou boîtier MAG avec son adresse MAC.'],
+    ['Générez vos identifiants', 'Renseignez vos coordonnées et effectuez la vérification de sécurité dans le formulaire.'],
+    ['Testez votre IPTV au United States', 'Vérifiez vos programmes et votre appareil avant de choisir un abonnement.']
+  ],
+  label: 'VOTRE ESSAI EN 3 ÉTAPES',
+  note: 'Revenez après 24 heures pour un nouvel accès, jusqu’à 7 essais sur 30 jours. Limites communes à nos sites; vérifiez chaque expiration.',
+  modal: 'Générateur d’essai IPTV USA',
+  close: 'Fermer',
+  loading: 'Chargement du générateur sécurisé…',
+  fallback: 'Le formulaire tarde à s’afficher ? Ouvrez-le directement dans un nouvel onglet.',
+  direct: 'Ouvrir le formulaire directement',
+  privacy: 'Confidentialité'
+} : {
+  eyebrow: '7-DAY IPTV USA TRIAL · DAILY RENEWAL',
+  heading: 'Generate your IPTV trial. Try it before you subscribe.',
+  body: 'Open the IPTV USA 8K generator, choose your connection and receive your trial login details. Test channels, the TV guide and playback on your own device and home Internet connection in the United States.',
+  cta: 'Generate my free trial',
+  support: 'Shared activation support',
+  details: 'The generator runs through our shared activation service. Availability and request limits appear in the form. Your player shows the exact trial expiry.',
+  perks: ['No credit card', 'No automatic payment', 'Xtream Codes, M3U and MAG boxes'],
+  steps: [
+    ['Choose your connection', 'Use an app or Smart TV with Xtream Codes and M3U, or connect a MAG box using its MAC address.'],
+    ['Generate your trial details', 'Enter your contact information and complete the security check inside the trial form.'],
+    ['Test your IPTV in the United States', 'Check the programs and device you actually use before choosing an IPTV subscription.']
+  ],
+  label: 'YOUR TRIAL IN 3 STEPS',
+  note: 'Return after 24 hours for new access, up to 7 trials in 30 days. Limits are shared across our websites; check each expiry.',
+  modal: 'IPTV USA trial generator',
+  close: 'Close',
+  loading: 'Loading the secure trial generator…',
+  fallback: 'Form taking longer to load? Open it directly in a new tab.',
+  direct: 'Open the form directly',
+  privacy: 'Privacy'
+};
+---
+{mode !== 'modal' && <section class="trial-generator-section" id="free-trial" aria-labelledby="trial-generator-heading">
+  <div class="wrap trial-generator-grid">
+    <div class="trial-generator-copy">
+      <span class="eyebrow">{t.eyebrow}</span>
+      <h2 id="trial-generator-heading">{t.heading}</h2>
+      <p>{t.body}</p>
+      <ul class="trial-generator-perks">{t.perks.map(perk => <li><span aria-hidden="true">✓</span>{perk}</li>)}</ul>
+      <div class="trial-generator-actions"><a class="button" href={url} data-open-trial>{t.cta}<span aria-hidden="true">→</span></a><a class="trial-generator-help" href={generatorSupportUrl(lang)} target="_blank" rel="noopener noreferrer">{t.support} ↗</a></div>
+      <p class="trial-generator-disclosure">{t.details}</p>
+    </div>
+    <div class="trial-generator-steps"><span class="trial-generator-label">{t.label}</span><ol>{t.steps.map((step, i) => <li><span class="trial-step-number" aria-hidden="true">0{i+1}</span><div><h3>{step[0]}</h3><p>{step[1]}</p></div></li>)}</ol><p class="trial-generator-limit">{t.note}</p></div>
+  </div>
+</section>}
+{mode === 'modal' && <dialog id="trial-generator-modal" class="trial-generator-dialog" aria-label={t.modal} data-widget-url={url}>
+  <div class="trial-dialog-bar"><span>{t.modal}</span><button type="button" data-close-trial autofocus aria-label={t.close}>{t.close} <span aria-hidden="true">×</span></button></div>
+  <p class="trial-dialog-status" role="status" data-trial-status data-loading={t.loading} data-fallback={t.fallback}>{t.loading}</p>
+  <iframe title={t.modal} class="trial-generator-frame" allow="clipboard-write" referrerpolicy="no-referrer" data-trial-frame></iframe>
+  <div class="trial-dialog-footer"><a href={url} target="_blank" rel="noopener noreferrer" data-trial-direct>{t.direct} ↗</a><a href={href('privacy', lang)}>{t.privacy}</a></div>
+</dialog>}
+<style>
+.trial-generator-section{background:radial-gradient(ellipse at 10% 0%,#64282d 0%,transparent 56%),#141821;color:#fff;padding:84px 0;overflow:hidden}.trial-generator-grid{display:grid;grid-template-columns:1.15fr 1fr;align-items:center;gap:68px}.trial-generator-copy .eyebrow{color:#ffb9bd}.trial-generator-copy h2{font-size:clamp(2rem,3.4vw,3.25rem);line-height:1.15;max-width:670px;color:#fff;letter-spacing:-.04em}.trial-generator-copy>p{font-size:16px;line-height:1.8;color:#c7cbd4;max-width:650px;margin-top:23px}.trial-generator-perks{list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:11px 22px;margin:24px 0}.trial-generator-perks li{margin:0;font-size:12px;display:flex;gap:8px;color:#e1e4ea}.trial-generator-perks span{color:#f6949d}.trial-generator-actions{display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin-top:30px}.trial-generator-actions .button{background:#ca3044;border-color:#ca3044;color:white;font-size:14px;padding:15px 24px;min-height:55px;border-radius:8px}.trial-generator-actions .button:hover{background:#ad2436}.trial-generator-help{font-size:12px;text-decoration:underline;text-underline-offset:4px;color:#f4f4f8}.trial-generator-copy>.trial-generator-disclosure{font-size:11px;color:#aeb4c3;line-height:1.7;margin-top:20px;max-width:590px}.trial-generator-steps{border:1px solid #ffffff24;border-radius:18px;background:#ffffff06;padding:30px}.trial-generator-label{font-size:10px;color:#bec5d2;letter-spacing:.15em;font-weight:700}.trial-generator-steps ol{list-style:none;margin:26px 0 0;padding:0}.trial-generator-steps li{display:flex;gap:20px;padding:22px 0;border-top:1px solid #ffffff17;margin:0;align-items:start}.trial-step-number{font-family:var(--display);font-size:14px;color:#fc7b8c;background:#cf304428;display:grid;place-content:center;border-radius:10px;width:41px;height:41px;flex:0 0 41px}.trial-generator-steps h3{font-size:18px;letter-spacing:-.025em;line-height:1.35;color:white;margin:1px 0 9px}.trial-generator-steps p{font-size:12px;color:#aeb4c3;line-height:1.7}.trial-generator-steps .trial-generator-limit{font-size:10px;padding-top:18px;border-top:1px solid #ffffff17;margin:0;color:#cad0da}.trial-generator-dialog{border:1px solid #fff2;padding:0;border-radius:16px;width:min(540px,calc(100vw - 20px));max-width:540px;max-height:calc(100dvh - 20px);overflow:auto;color:#24302c;background:#f5f7f3;box-shadow:0 24px 100px #0009;margin:auto}.trial-generator-dialog::backdrop{background:#080c16d9;backdrop-filter:blur(5px)}.trial-dialog-bar{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:10px 16px;background:#141821;color:#fff;font-size:12px;font-weight:600}.trial-dialog-bar button{display:flex;align-items:center;gap:12px;color:white;background:transparent;border:0;border-radius:6px;padding:9px 6px;font-size:12px;min-height:40px}.trial-dialog-bar button span{font-size:23px;line-height:1}.trial-generator-frame{width:100%;height:min(760px,calc(100dvh - 150px));display:block;border:0;background:#f5f7f3}.trial-dialog-status{font-size:12px;line-height:1.65;padding:15px 18px;color:#555e55;margin:0}.trial-dialog-footer{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:12px 16px;border-top:1px solid #dfe4dc;font-size:11px}.trial-dialog-footer a{color:#313e35;text-decoration:underline;text-underline-offset:3px;min-height:30px;display:inline-flex;align-items:center}.trial-generator-dialog :focus-visible{outline:3px solid #c33749;outline-offset:2px}@media(max-width:900px){.trial-generator-grid{grid-template-columns:1fr;gap:35px}.trial-generator-section{padding-block:60px}.trial-generator-copy h2{max-width:740px}.trial-generator-steps ol{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}.trial-generator-steps li{display:block}.trial-step-number{margin-bottom:16px}.trial-generator-steps{padding:25px}}@media(max-width:600px){.trial-generator-section{padding-block:45px}.trial-generator-copy h2{font-size:32px}.trial-generator-copy>p{font-size:14px}.trial-generator-perks{display:grid;gap:9px}.trial-generator-actions{align-items:flex-start;flex-direction:column;gap:18px}.trial-generator-actions .button{width:100%;font-size:13px}.trial-generator-steps ol{display:block;margin-top:18px}.trial-generator-steps li{display:flex;gap:15px;padding:18px 0}.trial-step-number{margin:0}.trial-generator-steps h3{font-size:17px}.trial-generator-steps{padding:22px}.trial-dialog-bar,.trial-dialog-footer{padding-inline:12px}.trial-dialog-bar{font-size:10px}.trial-dialog-footer{font-size:10px;gap:12px}}
+</style>
+<script>
+  const modal = document.querySelector<HTMLDialogElement>('#trial-generator-modal');
+  if (modal && !modal.dataset.initialized) {
+    modal.dataset.initialized = 'true';
+    const frame = modal.querySelector<HTMLIFrameElement>('[data-trial-frame]')!;
+    const status = modal.querySelector<HTMLElement>('[data-trial-status]')!;
+    const direct = modal.querySelector<HTMLAnchorElement>('[data-trial-direct]')!;
+    const expectedOrigin = new URL(modal.dataset.widgetUrl!).origin;
+    let trigger: HTMLElement | null = null;
+    let previousOverflow = '';
+    let timer: ReturnType<typeof setTimeout>;
+    function openTrial(button: HTMLElement) {
+      if (!modal || modal.open || typeof modal.showModal !== 'function') return false;
+      const url = new URL(modal.dataset.widgetUrl!);
+      const attribution = new URLSearchParams({ page: location.origin + location.pathname });
+      try { if (document.referrer) attribution.set('referrer', new URL(document.referrer).origin); } catch {}
+      const query = new URLSearchParams(location.search);
+      for (const key of ['utm_source', 'utm_medium', 'utm_campaign']) { const value = query.get(key); if (value) attribution.set(key, value.slice(0, 120)); }
+      url.hash = attribution.toString();
+      trigger = button;
+      frame.src = url.href;
+      direct.href = url.href;
+      status.hidden = false;
+      status.textContent = status.dataset.loading!;
+      frame.style.height = 'min(760px, calc(100dvh - 150px))';
+      previousOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      modal.showModal();
+      timer = setTimeout(() => { status.textContent = status.dataset.fallback!; }, 12000);
+      return true;
+    }
+    document.addEventListener('click', event => {
+      const trigger = (event.target as Element | null)?.closest<HTMLElement>('[data-open-trial]');
+      if (!trigger || !(event instanceof MouseEvent) || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      if (openTrial(trigger)) event.preventDefault();
+    });
+    modal.querySelector('[data-close-trial]')?.addEventListener('click', () => modal.close());
+    modal.addEventListener('click', event => {
+      const bounds = modal.getBoundingClientRect();
+      if (event.target === modal && (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom)) modal.close();
+    });
+    modal.addEventListener('close', () => {
+      clearTimeout(timer);
+      frame.removeAttribute('src');
+      document.body.style.overflow = previousOverflow;
+      trigger?.focus();
+    });
+    window.addEventListener('message', event => {
+      if (!modal.open || event.origin !== expectedOrigin || event.source !== frame.contentWindow) return;
+      if (event.data?.type === 'emerald-trial-ready') { clearTimeout(timer); status.hidden = true; }
+      if (event.data?.type === 'emerald-trial-close') modal.close();
+      if (event.data?.type === 'emerald-trial-size' && Number.isFinite(event.data.height) && event.data.height >= 200 && event.data.height <= 1800) frame.style.height = `min(${Math.ceil(event.data.height)}px, calc(100dvh - 128px))`;
+    });
+  }
+</script>

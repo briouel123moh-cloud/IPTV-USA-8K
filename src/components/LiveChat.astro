@@ -1,0 +1,141 @@
+---
+import { site } from '../data/site.mjs';
+import { generator } from '../data/generator.mjs';
+import { supportWhatsAppUrl } from '../lib/plan-request.mjs';
+import { href } from '../data/routes.mjs';
+const { lang = 'en' } = Astro.props;
+const fr = lang === 'fr';
+const supportUrl = supportWhatsAppUrl(fr ? 'fr' : 'en', site.phone || generator.sharedSupportNumber);
+---
+<aside class="live-chat" data-live-chat data-lang={fr ? 'fr' : 'en'} aria-label={fr ? 'Assistance par clavardage' : 'Chat support'}>
+  <button class="chat-launcher" type="button" data-chat-launcher hidden aria-expanded="false" aria-controls="chat-loading-panel">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 11.5a8.5 8.5 0 0 1-8.5 8.5 9.4 9.4 0 0 1-3.7-.8L3 21l1.6-4.7a8.5 8.5 0 1 1 15.4-4.8Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 11.5h.01m3.99 0h.01m3.99 0h.01" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
+    <span>{fr ? 'Clavarder' : 'Chat support'}</span>
+  </button>
+  <section id="chat-loading-panel" class="chat-loading-panel" data-chat-panel hidden aria-labelledby="chat-panel-title">
+    <div class="chat-panel-heading"><h2 id="chat-panel-title">{fr ? 'Assistance IPTV USA 8K' : 'IPTV USA 8K support'}</h2><button type="button" class="chat-panel-close" data-chat-close aria-label={fr ? 'Fermer le panneau de clavardage' : 'Close chat panel'}>×</button></div>
+    <p class="chat-load-status" data-chat-status role="status" aria-live="polite">{fr ? 'Ouverture du clavardage…' : 'Opening chat…'}</p>
+    <p class="chat-service-note">{fr ? 'La disponibilité de l’équipe s’affiche dans le clavardage. Vous pouvez aussi nous écrire sur WhatsApp.' : 'Team availability is shown inside the chat. You can also reach us on WhatsApp.'}</p>
+    <a class="chat-whatsapp" href={supportUrl}>{fr ? 'Continuer sur WhatsApp' : 'Continue on WhatsApp'} ↗</a>
+    <p class="chat-privacy">{fr ? 'Le clavardage est fourni par tawk.to.' : 'Chat is provided by tawk.to.'} <a href={href('privacy',fr ? 'fr' : 'en')}>{fr ? 'Confidentialité' : 'Privacy'}</a></p>
+  </section>
+  <noscript><a class="chat-launcher chat-no-script" href={supportUrl}>{fr ? 'Assistance WhatsApp' : 'WhatsApp support'} ↗</a></noscript>
+</aside>
+<script>
+  // Official widget API: https://developer.tawk.to/jsapi/
+  // Placement: https://help.tawk.to/article/customizing-your-widget-placement-with-the-javascript-api
+  type ChatApi = {
+    onLoad?: () => void;
+    onChatMaximized?: () => void;
+    onChatMinimized?: () => void;
+    onChatHidden?: () => void;
+    showWidget?: () => void;
+    hideWidget?: () => void;
+    maximize?: () => void;
+    customStyle?: Record<string, unknown>;
+  };
+  const chatWindow = window as Window & { Tawk_API?: ChatApi; Tawk_LoadStart?: Date };
+  const chat = document.querySelector<HTMLElement>('[data-live-chat]');
+  if (chat) {
+    const fr = chat.dataset.lang === 'fr';
+    const launcher = chat.querySelector<HTMLButtonElement>('[data-chat-launcher]')!;
+    const panel = chat.querySelector<HTMLElement>('[data-chat-panel]')!;
+    const status = chat.querySelector<HTMLElement>('[data-chat-status]')!;
+    let state: 'idle' | 'loading' | 'ready' | 'unavailable' = 'idle';
+    let requested = false;
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    const showLauncher = () => {
+      launcher.hidden = false;
+      launcher.disabled = false;
+      launcher.setAttribute('aria-expanded', 'false');
+      launcher.removeAttribute('aria-busy');
+    };
+    const showUnavailable = () => {
+      if (state === 'ready') return;
+      state = 'unavailable';
+      requested = false;
+      clearTimeout(timeout);
+      status.textContent = fr ? 'Le clavardage n’a pas pu s’ouvrir. Utilisez WhatsApp pour joindre l’équipe.' : 'Chat could not open. Use WhatsApp to reach the team.';
+      showLauncher();
+      launcher.setAttribute('aria-expanded', String(!panel.hidden));
+    };
+    const openWidget = () => {
+      const api = chatWindow.Tawk_API;
+      if (typeof api?.showWidget !== 'function' || typeof api.maximize !== 'function') {
+        state = 'unavailable';
+        panel.hidden = false;
+        showUnavailable();
+        return;
+      }
+      requested = true;
+      panel.hidden = true;
+      api.showWidget();
+      api.maximize();
+    };
+    launcher.addEventListener('click', () => {
+      if (state === 'ready') { openWidget(); return; }
+      panel.hidden = false;
+      launcher.setAttribute('aria-expanded', 'true');
+      if (state !== 'idle') return;
+      state = 'loading';
+      requested = true;
+      launcher.setAttribute('aria-busy', 'true');
+      status.textContent = fr ? 'Ouverture du clavardage…' : 'Opening chat…';
+      const api = chatWindow.Tawk_API = chatWindow.Tawk_API || {};
+      // Keep the mobile widget above the site's fixed trial bar; its full-screen
+      // chat remains managed by tawk.to. No contact details are prepopulated.
+      api.customStyle = {
+        zIndex: 60,
+        visibility: {
+          desktop: { position: 'br', xOffset: 24, yOffset: 24 },
+          mobile: { position: 'br', xOffset: 12, yOffset: 90 }
+        }
+      };
+      api.onLoad = () => {
+        clearTimeout(timeout);
+        state = 'ready';
+        launcher.disabled = false;
+        launcher.removeAttribute('aria-busy');
+        if (requested) openWidget();
+        else { api.hideWidget?.(); showLauncher(); }
+      };
+      api.onChatMaximized = () => {
+        panel.hidden = true;
+        launcher.hidden = true;
+        launcher.setAttribute('aria-expanded', 'true');
+      };
+      api.onChatMinimized = () => {
+        requested = false;
+        api.hideWidget?.();
+        showLauncher();
+        launcher.focus({ preventScroll: true });
+      };
+      api.onChatHidden = () => {
+        requested = false;
+        showLauncher();
+      };
+      chatWindow.Tawk_LoadStart = new Date();
+      const script = document.createElement('script');
+      script.id = 'iptv-usa-8k-tawk-widget';
+      script.async = true;
+      script.src = 'https://embed.tawk.to/6ae7648f2deb603c3329a698/default';
+      script.charset = 'UTF-8';
+      script.crossOrigin = 'anonymous';
+      script.addEventListener('error', showUnavailable, { once: true });
+      timeout = setTimeout(showUnavailable, 20000);
+      document.head.appendChild(script);
+    });
+    const closePanel = () => {
+      requested = false;
+      panel.hidden = true;
+      launcher.setAttribute('aria-expanded', 'false');
+      launcher.focus({ preventScroll: true });
+    };
+    chat.querySelector('[data-chat-close]')?.addEventListener('click', closePanel);
+    chat.addEventListener('keydown', event => { if (event.key === 'Escape' && !panel.hidden) closePanel(); });
+    launcher.hidden = false;
+  }
+</script>
+<style>
+.live-chat{position:fixed;right:24px;bottom:24px;z-index:40;display:flex;flex-direction:column;align-items:flex-end;max-width:calc(100vw - 32px)}.chat-launcher{display:inline-flex;align-items:center;justify-content:center;gap:11px;min-height:50px;padding:13px 19px;border:1px solid #ffffff2b;border-radius:999px;background:#172539;color:#fff;box-shadow:0 6px 25px #0d1c3233;font:inherit;font-size:13px;font-weight:750;cursor:pointer}.chat-launcher:hover{background:#243a56;color:#fff}.chat-launcher:disabled{cursor:wait}.chat-launcher:focus-visible,.chat-panel-close:focus-visible,.chat-whatsapp:focus-visible{outline:3px solid #c44a5c;outline-offset:4px}.chat-launcher svg{flex-shrink:0}.chat-loading-panel{position:absolute;right:0;bottom:63px;width:min(340px,calc(100vw - 32px));padding:22px;border:1px solid #dce1e8;border-radius:16px;background:#fff;box-shadow:0 12px 50px #17253926;color:#172539;max-height:calc(100dvh - 110px);overflow:auto}.chat-panel-heading{display:flex;align-items:flex-start;gap:15px;justify-content:space-between;margin-bottom:15px}.chat-panel-heading h2{font-family:var(--font);font-size:17px;font-weight:750;letter-spacing:0;line-height:1.4}.chat-panel-close{border:0;background:#f2f4f7;color:#172539;border-radius:6px;min-width:32px;min-height:32px;font-size:24px;line-height:1;cursor:pointer;margin:-5px -5px 0 0}.chat-load-status{font-size:14px;line-height:1.7;color:#263449;font-weight:600}.chat-service-note{font-size:12px;line-height:1.75;color:#637083;margin-top:12px}.chat-whatsapp{display:block;margin-top:18px;padding:12px 15px;border-radius:7px;background:#176944;color:white;text-align:center;font-size:12px;font-weight:750}.chat-whatsapp:hover{color:white;background:#105036}.chat-privacy{font-size:10px;line-height:1.7;color:#6b7686;margin-top:13px}.chat-privacy a{text-decoration:underline;text-underline-offset:3px}.chat-no-script{font-size:12px}@media(max-width:850px){.live-chat{right:12px;bottom:calc(78px + env(safe-area-inset-bottom));max-width:calc(100vw - 24px)}.chat-launcher{min-height:46px;padding:11px 15px;font-size:12px}.chat-launcher svg{width:20px;height:20px}.chat-loading-panel{bottom:58px;width:min(330px,calc(100vw - 24px));max-height:calc(100dvh - 165px - env(safe-area-inset-bottom))}}
+</style>

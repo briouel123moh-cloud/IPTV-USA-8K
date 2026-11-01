@@ -1,0 +1,6 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "iptv-usa-8k",
+  "pages_build_output_dir": "dist",
+  "compatibility_date": "2026-11-01"
+}

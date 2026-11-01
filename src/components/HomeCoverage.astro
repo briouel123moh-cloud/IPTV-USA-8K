@@ -1,0 +1,136 @@
+---
+import { homeSections } from '../data/home-sections';
+import { href } from '../data/routes.mjs';
+import { generatorUrl } from '../data/generator.mjs';
+const { lang = 'en' } = Astro.props;
+const fr = false;
+const sections = homeSections.en;
+const artwork: Record<string, { src: string; width: number; height: number; alt: string }> = {
+  'iptv-usa-vod': {
+    src: '/images/iptv-usa-8k-cinema.webp', width: 1200, height: 675,
+    alt: 'IPTV USA 8K promotional artwork for movies, series and home entertainment',
+  },
+  'iptv-usa-sports': {
+    src: '/images/iptv-usa-8k-sports.webp', width: 1200, height: 675,
+    alt: 'IPTV USA 8K promotional artwork for American football, basketball, baseball and live sports',
+  },
+};
+const comparisonSections = new Set(['iptv-vs-cable-usa', 'iptv-usa-setup', 'iptv-usa-multiple-devices']);
+const splitSections = new Set(['spanish-iptv-usa', 'iptv-usa-subscriptions']);
+const tableLabels = (id: string) => {
+  if (id === 'iptv-usa-setup') return fr ? ['Votre appareil', 'Installation et points à vérifier'] : ['Your device', 'Setup and checks before you start'];
+  if (id === 'iptv-usa-multiple-devices') return fr ? ['Votre façon de regarder', 'Connexions et configuration à confirmer'] : ['How your household watches', 'Connections and setup to confirm'];
+  return fr ? ['Ce que vous comparez', 'Ce qu’il faut vérifier avant l’abonnement'] : ['What you compare', 'What to check before subscribing'];
+};
+---
+<div class="home-coverage">
+  {sections.map((section, sectionIndex) => {
+    const picture = artwork[section.id];
+    const pictureFirst = section.id === 'iptv-usa-sports';
+    const isComparison = comparisonSections.has(section.id);
+    const columns = tableLabels(section.id);
+    return (
+      <section id={section.id} class:list={['coverage-section', section.tone && `coverage-${section.tone}`, { 'coverage-media': picture, 'coverage-split': splitSections.has(section.id), 'coverage-comparison': isComparison }]} aria-labelledby={`${section.id}-heading`}>
+        <div class="wrap coverage-wrap">
+          {picture && pictureFirst && <figure class="coverage-picture coverage-picture-first"><img src={picture.src} width={picture.width} height={picture.height} loading="lazy" decoding="async" alt={picture.alt}/><figcaption>{fr ? 'Visuel illustratif · Chaînes et événements à vérifier pendant votre essai' : 'Illustrative artwork · Check channels and events during your trial'}</figcaption></figure>}
+          <div class="coverage-editorial">
+            <header class="coverage-heading">
+              <h2 id={`${section.id}-heading`}>{section.heading}</h2>
+              <p>{section.intro}</p>
+            </header>
+            {picture && !pictureFirst && <figure class="coverage-picture"><img src={picture.src} width={picture.width} height={picture.height} loading="lazy" decoding="async" alt={picture.alt}/><figcaption>{fr ? 'Visuel illustratif · Disponibilité à vérifier pendant votre essai' : 'Illustrative artwork · Check availability during your trial'}</figcaption></figure>}
+            {isComparison ? (
+              <table class="coverage-table" role="table">
+                <caption class="coverage-sr-only">{section.heading}</caption>
+                <thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">{columns[0]}</th><th scope="col" role="columnheader">{columns[1]}</th></tr></thead>
+                <tbody role="rowgroup">{section.topics.map(topic => <tr role="row"><th scope="row" role="rowheader"><h3>{topic.heading}</h3></th><td role="cell"><p>{topic.text}</p></td></tr>)}</tbody>
+              </table>
+            ) : (
+              <div class="coverage-stories">
+                {section.topics.map(topic => <article class="coverage-story"><h3>{topic.heading}</h3><p>{topic.text}</p></article>)}
+              </div>
+            )}
+          </div>
+          <div class="coverage-actions">
+            <a class="text-link" href={href(section.link.route, lang)}>{section.link.label}<span aria-hidden="true">→</span></a>
+            {section.cta && <a class:list={['button', section.tone === 'dark' && 'button-light']} href={sectionIndex === sections.length - 1 ? href('plans', lang) : generatorUrl(lang)} data-open-trial={sectionIndex === sections.length - 1 ? undefined : ''}>{section.cta}<span aria-hidden="true">↗</span></a>}
+          </div>
+        </div>
+      </section>
+    );
+  })}
+</div>
+<style>
+  .home-coverage{--coverage-ink:#17202e;--coverage-muted:#536071;--coverage-line:#dce2e9}
+  .home-coverage .coverage-section{padding-block:80px;border-top:1px solid var(--coverage-line);scroll-margin-top:88px;background:#fff;color:var(--coverage-ink)}
+  .home-coverage .coverage-wrap{max-width:1200px}
+  .home-coverage .coverage-soft{background:#f4f6f8}
+  .home-coverage .coverage-heading{max-width:1020px;margin-bottom:38px}
+  .home-coverage .coverage-heading h2{font-size:clamp(30px,3.2vw,43px);font-weight:800;line-height:1.18;letter-spacing:-.035em;margin:0 0 22px;max-width:1000px;text-wrap:balance}
+  .home-coverage p{font-size:16px;line-height:1.85;color:var(--coverage-muted);margin:0}
+  .home-coverage .coverage-heading>p{max-width:96ch;font-size:17px;line-height:1.8}
+  .home-coverage h3{font-size:23px;font-weight:750;line-height:1.35;letter-spacing:-.025em;margin:0 0 15px;color:inherit}
+  .coverage-picture{margin:0 0 42px;overflow:hidden;border:1px solid var(--coverage-line);border-radius:22px;background:#101923;box-shadow:0 16px 44px #16253812}
+  .coverage-picture img{display:block;width:100%;height:auto}
+  .coverage-picture figcaption{padding:13px 20px;font-size:12px;line-height:1.6;color:#d4dce7;background:#101923}
+  .coverage-picture-first{margin-bottom:44px}
+  .coverage-stories{display:grid;gap:29px}
+  .coverage-story{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.7fr);gap:40px;padding-top:29px;border-top:1px solid var(--coverage-line);min-width:0}
+  .coverage-story h3{margin:0}
+  .coverage-media .coverage-stories{grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 44px}
+  .coverage-media .coverage-story{display:block}
+  .coverage-media .coverage-story h3{margin-bottom:15px}
+  .coverage-media .coverage-story:first-child{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.7fr);grid-column:1/-1;gap:40px}
+  .coverage-media .coverage-story:first-child h3{margin:0}
+  .coverage-split .coverage-editorial{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.3fr);gap:64px;align-items:start}
+  .coverage-split .coverage-heading{margin:0}
+  .coverage-split .coverage-heading h2{font-size:clamp(30px,3vw,39px);text-wrap:initial}
+  .coverage-split .coverage-stories{gap:28px}
+  .coverage-split .coverage-story{display:block;padding-top:27px}
+  .coverage-split .coverage-story:first-child{padding-top:0;border:0}
+  .coverage-split .coverage-story h3{margin-bottom:13px}
+  .coverage-table{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0;border:1px solid var(--coverage-line);border-radius:18px;overflow:hidden;background:#fff;text-align:left}
+  .coverage-table th,.coverage-table td{padding:26px 28px;vertical-align:top}
+  .coverage-table thead th{background:#172434;color:#fff;font-size:14px;line-height:1.5;font-weight:700;padding-block:17px}
+  .coverage-table thead th:first-child{width:32%}
+  .coverage-table tbody th{background:#fafbfc}
+  .coverage-table tbody tr+tr>th,.coverage-table tbody tr+tr>td{border-top:1px solid var(--coverage-line)}
+  .home-coverage .coverage-table h3{font-size:21px;line-height:1.4;margin:0}
+  .coverage-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  .coverage-actions{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px;margin-top:36px;padding-top:26px;border-top:1px solid var(--coverage-line)}
+  .coverage-actions .text-link{font-size:15px;line-height:1.6;color:var(--red,#ba2338);font-weight:750;max-width:100%}
+  .coverage-actions .button{font-size:14px;white-space:normal;text-align:center;min-height:48px;max-width:100%}
+  .home-coverage .coverage-dark{background:linear-gradient(135deg,#0e1725,#172436);color:#fff;border-color:#172436;--coverage-line:#364354;--coverage-muted:#c8d2df}
+  .coverage-dark .coverage-picture{border-color:#405064;box-shadow:0 18px 50px #0003}
+  .coverage-dark .coverage-actions .text-link{color:#fff}
+  .coverage-dark .coverage-actions .button-light{background:#fff;color:#17202e;border-color:#fff}
+  @media(max-width:1000px){
+    .coverage-split .coverage-editorial{gap:38px;grid-template-columns:minmax(0,.85fr) minmax(0,1.2fr)}
+    .coverage-story,.coverage-media .coverage-story:first-child{gap:28px}
+    .coverage-table th,.coverage-table td{padding:23px}
+  }
+  @media(max-width:760px){
+    .home-coverage .coverage-section{padding-block:54px;scroll-margin-top:76px}
+    .home-coverage .coverage-heading{margin-bottom:28px}
+    .home-coverage .coverage-heading h2,.coverage-split .coverage-heading h2{font-size:31px;line-height:1.2;text-wrap:initial;margin-bottom:19px}
+    .home-coverage .coverage-heading>p,.home-coverage p{font-size:16px;line-height:1.8}
+    .home-coverage h3{font-size:22px}
+    .coverage-picture{border-radius:15px;margin-bottom:30px}
+    .coverage-picture-first{margin-bottom:30px}
+    .coverage-picture figcaption{padding:11px 14px;font-size:11px}
+    .coverage-stories,.coverage-media .coverage-stories{grid-template-columns:1fr;gap:26px}
+    .coverage-story,.coverage-media .coverage-story:first-child{display:block;padding-top:26px}
+    .coverage-story h3,.coverage-media .coverage-story:first-child h3{margin-bottom:13px}
+    .coverage-split .coverage-editorial{display:block}
+    .coverage-split .coverage-heading{margin-bottom:30px}
+    .coverage-split .coverage-story:first-child{border-top:1px solid var(--coverage-line);padding-top:26px}
+    .coverage-table,.coverage-table tbody,.coverage-table tr,.coverage-table th,.coverage-table td{display:block;width:100%}
+    .coverage-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+    .coverage-table tbody th{padding:23px 22px 11px;background:transparent}
+    .coverage-table tbody td{padding:0 22px 24px}
+    .coverage-table tbody tr+tr>td{border:0}
+    .home-coverage .coverage-table h3{font-size:22px}
+    .coverage-actions{align-items:flex-start;flex-direction:column;gap:22px;margin-top:29px;padding-top:24px}
+    .coverage-actions .button{width:100%;font-size:14px}
+  }
+</style>

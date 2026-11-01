@@ -1,0 +1,107 @@
+---
+import { generatorSupportUrl } from '../data/generator.mjs';
+import { href } from '../data/routes.mjs';
+const { lang = 'en' } = Astro.props;
+const fr = lang === 'fr';
+const sections = fr ? [
+  {
+    heading: 'Le site et le générateur d’essai',
+    paragraphs: [
+      'IPTV USA 8K propose des informations IPTV, un accès au générateur d’essai et des demandes de devis pour le United States en français et en anglais. Le site ne prélève aucun paiement et ne vous demande pas de carte bancaire. Aucun pixel publicitaire n’est installé. Le clavardage facultatif se charge seulement lorsque vous le demandez.',
+      'L’essai gratuit est fourni par notre service d’activation partagé, hébergé à l’adresse control.emeraldiptv.irish. Le générateur est distinct de l’outil qui prépare une demande de renseignements sur notre page de contact.'
+    ]
+  },
+  {
+    heading: 'Quand vous ouvrez le générateur',
+    paragraphs: [
+      'Le générateur ne se charge qu’après l’ouverture de son bouton ou de son lien. Cette ouverture transmet une requête technique au service d’activation et à Cloudflare, qui peuvent traiter votre adresse IP et des informations sur votre navigateur pour afficher et sécuriser le formulaire.',
+      'Cloudflare Turnstile vérifie la sécurité de la connexion. Ouvrir le formulaire ne génère pas d’essai. Vous choisissez ensuite de saisir vos coordonnées et d’envoyer une demande. Le générateur utilise sa propre fenêtre intégrée ; la page IPTV USA 8K ne lit pas vos identifiants de lecture.'
+    ]
+  },
+  {
+    heading: 'Les renseignements d’une demande d’essai',
+    paragraphs: [
+      'Lorsque vous envoyez le formulaire, le service reçoit votre nom, votre courriel, votre numéro de téléphone ou WhatsApp, votre adresse IP et le type de connexion choisi. Pour un boîtier MAG, il reçoit également son adresse MAC.',
+      'La demande peut aussi comprendre la page d’origine, le nom du site qui vous a recommandé cette page et les indications de campagne présentes dans le lien, comme la source ou le nom de campagne. Ces éléments servent à comprendre l’origine de la demande, pas à donner une autorisation d’accès.',
+      'Ces renseignements permettent de créer et retrouver votre essai, d’appliquer les limites de demande, de prévenir les abus et de vous aider en cas de problème. Le fournisseur d’activation reçoit les renseignements nécessaires à la création de l’accès, notamment les paramètres de connexion et les informations utiles au suivi de la demande.'
+    ]
+  },
+  {
+    heading: 'Conservation et assistance',
+    paragraphs: [
+      'Le générateur conserve des dossiers chiffrés contenant les renseignements de demande et les identifiants délivrés pendant une durée maximale de 30 jours. Les vérifications de limites utilisent des empreintes protégées des coordonnées et de l’adresse IP.',
+      'Une demande réussie peut produire un dossier de suivi dans les outils existants de l’équipe d’activation, notamment Telegram et Google Sheets. Ce suivi peut contenir vos coordonnées, votre adresse IP, la source de la demande et le nom d’utilisateur délivré. Les mots de passe de lecture ne sont pas envoyés à ces outils.',
+      'Les copies destinées à l’assistance suivent une conservation distincte : leur suppression automatique après 30 jours n’est pas annoncée par ce site. Contactez l’équipe d’activation pour toute question sur ces dossiers ou pour demander leur examen, leur correction ou leur suppression.'
+    ]
+  },
+  {
+    heading: 'Préparer un message sur la page de contact',
+    paragraphs: [
+      'Le calculateur de devis fonctionne dans votre navigateur avec les montants saisis. Il ne transmet ni ne conserve ces montants sur nos serveurs.',
+      'La préparation d’une demande de renseignements reste dans votre navigateur. Le texte n’est pas envoyé automatiquement ni enregistré par cette fonction sur nos serveurs. Copier le message ou le télécharger est une action locale.',
+      'Les boutons WhatsApp des forfaits et de l’assistance ouvrent un message prérempli. Pour un forfait, ce message contient la durée et les écrans sélectionnés. L’ouverture du lien transmet son contenu à WhatsApp; vous pouvez ensuite modifier le message avant de l’envoyer à l’équipe. WhatsApp applique ses propres pratiques de confidentialité. N’ajoutez pas de mot de passe, de numéro de carte bancaire ni de renseignements sensibles à une demande d’aide.'
+    ]
+  },
+  {
+    heading: 'Hébergement et liens externes',
+    paragraphs: [
+      'Cloudflare héberge ce site. L’hébergement peut traiter des renseignements techniques, comme votre adresse IP et les requêtes de navigation, pour fournir le site et protéger son fonctionnement. Les images et les polices du site sont servies par son propre hébergement.',
+      'Les autres sites proposés dans nos liens régionaux, ainsi que les services de contact et d’activation, ont leurs propres conditions et pratiques. Le numéro d’aide du générateur appartient à l’équipe d’activation partagée ; il n’est pas présenté comme un nouveau numéro canadien.'
+    ]
+  }
+] : [
+  {
+    heading: 'The website and the trial generator',
+    paragraphs: [
+      'IPTV USA 8K provides IPTV information, access to the trial generator and quote requests for US households in English. This website takes no payments and does not ask for payment-card details. No advertising pixels are installed. Optional live chat loads only when you request it.',
+      'Free trials use our shared activation service at control.emeraldiptv.irish. The generator is separate from the enquiry-drafting tool on our contact page.'
+    ]
+  },
+  {
+    heading: 'When you open the generator',
+    paragraphs: [
+      'The generator loads only when you open its button or link. Opening it makes a technical request to the activation service and Cloudflare, which may process your IP address and browser information to display and protect the form.',
+      'Cloudflare Turnstile checks the connection for abuse. Opening the form does not generate a trial. You then choose whether to enter your details and submit a request. The generator runs in a separate embedded window; the IPTV USA 8K page does not read your playback credentials.'
+    ]
+  },
+  {
+    heading: 'Information in a trial request',
+    paragraphs: [
+      'When you submit the form, the service receives your name, email address, phone or WhatsApp number, connecting IP address and selected connection type. A MAG-box request also includes the device’s MAC address.',
+      'The request may include the source page, the hostname of the website that referred you, and campaign labels present in the link, such as its source or campaign name. These help identify where the request came from; they do not authorize access.',
+      'This information is used to create and retrieve your trial, apply request limits, prevent abuse and provide support. The activation provider receives the information needed to create access, including connection parameters and relevant request-tracking details.'
+    ]
+  },
+  {
+    heading: 'Retention and support records',
+    paragraphs: [
+      'The generator keeps encrypted records of request details and issued credentials for up to 30 days. Request-limit checks use protected fingerprints of contact details and IP addresses.',
+      'A successful request may create a support record in the activation team’s existing tools, including Telegram and Google Sheets. It may contain your contact details, IP address, request source and issued username. Playback passwords are not sent to those tools.',
+      'Support copies have separate retention arrangements; this website does not promise that they are automatically deleted after 30 days. Contact the activation team with questions about these records or to request their review, correction or deletion.'
+    ]
+  },
+  {
+    heading: 'Preparing an enquiry on the contact page',
+    paragraphs: [
+      'The quote calculator runs in your browser using the amounts you enter. It does not submit or store those amounts on our servers.',
+      'Preparing an enquiry keeps the message in your browser. This feature does not automatically submit the text or store it on our servers. Copying or downloading the message is a local action.',
+      'WhatsApp buttons for plans and support open a prefilled message. For a plan, the message includes your selected duration and screens. Opening the link transfers its contents to WhatsApp; you can then edit the message before sending it to the team. WhatsApp applies its own privacy practices. Do not include passwords, payment-card numbers or sensitive information in a support message.'
+    ]
+  },
+  {
+    heading: 'Hosting and external links',
+    paragraphs: [
+      'Cloudflare hosts this website. Hosting may process technical information, including your IP address and browsing requests, to deliver and protect the site. Website images and fonts are served from the site’s own hosting.',
+      'Regional websites, contact services and activation services linked here have their own terms and practices. The generator’s support number belongs to the shared activation team; it is not represented as a newly established American phone number.'
+    ]
+  }
+];
+---
+<article class="wrap prose legal-content privacy-content">
+  {sections.map(section => <section><h2>{section.heading}</h2>{section.paragraphs.map(paragraph => <p>{paragraph}</p>)}</section>)}
+  <section class="privacy-chat"><h2>{fr ? 'Clavardage avec tawk.to' : 'Live chat with tawk.to'}</h2><p>{fr ? 'Le bouton de clavardage charge tawk.to uniquement lorsque vous le choisissez. Après l’ouverture, tawk.to peut recevoir votre adresse IP, des renseignements sur le navigateur et la page consultée, et utiliser des témoins pour le service. Les messages et coordonnées que vous saisissez sont transmis à tawk.to et à l’équipe d’assistance.' : 'The Live Chat button loads tawk.to only when you choose it. After opening, tawk.to may receive your IP address, browser information and the page being viewed, and use cookies for the service. Messages and contact details you enter are shared with tawk.to and the support team.'}</p><p>{fr ? 'Les conversations suivent les modalités de conservation du service et du compte d’assistance; aucune durée fixe de suppression n’est annoncée ici. Contactez notre équipe pour une demande concernant vos données. N’envoyez pas de mot de passe ni de renseignements de paiement.' : 'Chats follow the service and support account’s retention arrangements; no fixed deletion period is promised here. Contact our team with requests about your information. Do not send passwords or payment details.'}</p><a class="text-link" href="https://www.tawk.to/privacy-policy/" target="_blank" rel="noopener noreferrer">{fr ? 'Politique de confidentialité de tawk.to' : 'tawk.to privacy policy'} ↗</a></section>
+  <section class="privacy-help"><h2>{fr ? 'Questions sur vos données' : 'Questions about your information'}</h2><p>{fr ? 'Pour une question concernant un essai ou ses données, contactez l’équipe d’activation partagée. Indiquez seulement les éléments nécessaires pour retrouver la demande ; n’envoyez pas vos mots de passe de lecture.' : 'For questions about a trial or its records, contact the shared activation team. Include only what is needed to identify the request; do not send your playback passwords.'}</p><a class="text-link" href={generatorSupportUrl(lang)} target="_blank" rel="noopener noreferrer">{fr ? 'Contacter l’équipe d’activation sur WhatsApp' : 'Contact the activation team on WhatsApp'} ↗</a><a class="text-link" href={href('contact', lang)}>{fr ? 'Page de contact IPTV USA 8K' : 'IPTV USA 8K contact page'} →</a></section>
+</article>
+<style>
+.privacy-content>section+section{margin-top:38px}.privacy-content h2{margin-bottom:16px}.privacy-content p{font-size:15px;line-height:1.85}.privacy-content p+p{margin-top:14px}.privacy-help{padding-top:26px;border-top:1px solid var(--line)}.privacy-help .text-link{display:flex;width:fit-content;line-height:1.5;margin-top:20px;color:var(--red);text-decoration:underline;text-underline-offset:4px;font-size:13px}
+</style>

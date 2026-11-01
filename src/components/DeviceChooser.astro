@@ -1,0 +1,73 @@
+---
+const { lang } = Astro.props;
+const fr = lang === 'fr';
+const devices = [
+  {
+    "id": "smart-tv",
+    "name": "Smart TV",
+    "badge": "Samsung · LG · Sony",
+    "text": "Check your TV’s exact model, year and operating system. A brand name alone does not tell you which players are available in its app store. Try the remote and login format before buying a subscription.",
+    "steps": [
+      "Find the model and software version in settings.",
+      "Choose a supported player in the TV’s official store.",
+      "Test the remote, local feed, audio and captions."
+    ]
+  },
+  {
+    "id": "fire-tv",
+    "name": "Fire TV / Firestick",
+    "badge": "Fire OS · Vega OS",
+    "text": "Fire TV models use different operating systems. Amazon lists both Fire OS and Vega OS devices; an Android app or installation guide for one does not establish support on the other. Check the exact model and its app store first.",
+    "steps": [
+      "Read the model and operating system in device information.",
+      "Confirm the player supports that exact Fire OS or Vega model.",
+      "Use the supported store instructions and test on your normal Wi-Fi."
+    ]
+  },
+  {
+    "id": "android-tv",
+    "name": "Android TV / Google TV",
+    "badge": "TV · Box · NVIDIA Shield",
+    "text": "Match the player to Android TV or Google TV and the account format supplied. A phone app may not provide a comfortable remote interface. Test your normal TV setup before adding more screens.",
+    "steps": [
+      "Confirm the device runs Android TV or Google TV.",
+      "Choose a player available through its official store.",
+      "Check the login format, favorites and EPG with your remote."
+    ]
+  },
+  {
+    "id": "apple",
+    "name": "Apple TV / iPhone / iPad",
+    "badge": "tvOS · iOS · iPadOS",
+    "text": "An iPhone app and an Apple TV app can be different products. Verify tvOS support for a television setup and check any player license separately from your IPTV subscription.",
+    "steps": [
+      "Note the model and installed system version.",
+      "Confirm the supported player and any app charge.",
+      "Test the chosen title, audio and captions on that screen."
+    ]
+  },
+  {
+    "id": "computer",
+    "name": "Computer",
+    "badge": "Windows · Mac",
+    "text": "Check whether the offer supports a desktop player or an official browser route. Use the correct account format and keep credential-bearing playlists out of unknown online players.",
+    "steps": [
+      "Ask for the supported player or official web address.",
+      "Use a trusted connection and enter the supplied format carefully.",
+      "Confirm active streams stay within the agreed allowance."
+    ]
+  }
+];
+---
+<div class="device-chooser" data-device-chooser>
+  <div class="device-tabs" role="tablist" aria-label={fr?'Choisir un appareil':'Choose a device'}>{devices.map((d,i)=><button type="button" role="tab" id={`tab-${d.id}`} aria-selected={i===0?'true':'false'} aria-controls={`panel-${d.id}`} tabindex={i===0?0:-1} data-device={d.id}>{d.name}<span>{d.badge}</span></button>)}</div>
+  {devices.map((d,i)=><section class="device-panel" role="tabpanel" id={`panel-${d.id}`} aria-labelledby={`tab-${d.id}`} tabindex="0" hidden={i!==0}><div class="device-drawing" aria-hidden="true"><div class="tv-outline"><span>IPTV <span>8K</span></span><i>USA</i></div><div class="tv-foot"></div></div><div><span class="eyebrow">{fr?'VOTRE APPAREIL, PAS À PAS':'YOUR DEVICE, STEP BY STEP'}</span><h2>{d.name}</h2><p>{d.text}</p><ol>{d.steps.map(s=><li>{s}</li>)}</ol></div></section>)}
+  <noscript><style>.device-panel[hidden]{display:grid}.device-tabs{display:none}</style></noscript>
+</div>
+<script>
+  document.querySelectorAll('[data-device-chooser]').forEach(chooser=>{
+    const tabs=Array.from(chooser.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
+    function select(tab:HTMLButtonElement){tabs.forEach(t=>{const active=t===tab;t.setAttribute('aria-selected',String(active));t.tabIndex=active?0:-1;chooser.querySelector(`#${t.getAttribute('aria-controls')}`)?.toggleAttribute('hidden',!active);});}
+    tabs.forEach((tab,i)=>{tab.addEventListener('click',()=>select(tab));tab.addEventListener('keydown',e=>{let next=i;if(e.key==='ArrowRight')next=(i+1)%tabs.length;else if(e.key==='ArrowLeft')next=(i+tabs.length-1)%tabs.length;else if(e.key==='Home')next=0;else if(e.key==='End')next=tabs.length-1;else return;e.preventDefault();select(tabs[next]);tabs[next].focus();});});
+  });
+</script>

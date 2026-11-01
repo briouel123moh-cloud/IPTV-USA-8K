@@ -1,0 +1,7 @@
+---
+import Base from '../layouts/Base.astro';
+import Home from '../components/Home.astro';
+import { searchMeta } from '../data/search-meta.mjs';
+const {title,description}=searchMeta.home.en;
+---
+<Base lang="en" id="home" title={title} description={description}><Home lang="en"/></Base>

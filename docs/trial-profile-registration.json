@@ -1,0 +1,46 @@
+{
+  "date": "2026-11-01",
+  "service": "Existing shared trial-control Worker",
+  "worker": "emerald-tvz",
+  "account": "afb811e0f3951d17e05c736047d2ec13",
+  "registry": "TRIAL_SITES_JSON",
+  "siteId": "usa",
+  "widgetUrl": "https://control.emeraldiptv.irish/widget?site=usa&lang=en",
+  "profile": {
+    "name": "IPTV USA 8K",
+    "package": "38180",
+    "origins": [
+      "https://iptv-usa-8k.tart-lemon-7570.chatgpt.site"
+    ],
+    "locale": "en",
+    "locales": [
+      "en"
+    ],
+    "countryCode": "1",
+    "phoneExample": "+1 415 555 0123",
+    "privacyPaths": {
+      "en": "/privacy/"
+    },
+    "accent": "#b52336",
+    "whatsapp": "212631479723"
+  },
+  "verification": {
+    "freshReadBeforeWrite": true,
+    "usaDidNotPreviouslyExist": true,
+    "bindingCount": 25,
+    "profileCount": 3,
+    "bindingsUnchanged": true,
+    "existingProfilesUnchanged": true,
+    "exactUsaProfileReadback": true,
+    "otherSettingsChanged": [],
+    "publicTrialsEnabled": true
+  },
+  "recognizedKeys": {
+    "name": "Profile display brand",
+    "whatsapp": "Per-profile support number; overrides global SUPPORT_WHATSAPP",
+    "origins": "Exact HTTPS iframe allowlist; first origin supplies privacy URL",
+    "privacyPaths": "Localized privacy route"
+  },
+  "limits": "USA uses the same package and unchanged shared backend quota, capacity and provider expiry rules as Canada. No seven-day duration setting was added or verified. No trial was issued, no provider call or CAPTCHA was attempted, and no customer records were read.",
+  "next": "When the purchased USA domain is connected, add its exact HTTPS origin and make it the first origin; keep privacy/support source configuration aligned."
+}

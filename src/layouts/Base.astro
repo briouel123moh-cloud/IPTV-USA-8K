@@ -1,0 +1,109 @@
+---
+import { site } from '../data/site.mjs';
+import { href } from '../data/routes.mjs';
+import { copy } from '../data/copy';
+import Brand from '../components/Brand.astro';
+import TrialGenerator from '../components/TrialGenerator.astro';
+import LiveChat from '../components/LiveChat.astro';
+import { generator, generatorUrl, generatorSupportUrl } from '../data/generator.mjs';
+import { guides } from '../data/guides';
+import { getQuestions } from '../data/questions';
+import { searchMeta } from '../data/search-meta.mjs';
+import '../styles/global.css';
+import '../styles/commercial.css';
+const { lang = 'en', id = 'home', title, description, isArticle = false, noindex = false, root = false } = Astro.props;
+const t = copy[lang];
+const navigation = [ ['plans',t.nav[0]], ['channels',lang==='fr'?'Chaînes':'Channels'], ['devices',t.nav[1]], ['guides',t.nav[2]] ];
+const pagePath = id === '404' ? '/404.html' : href(id, lang);
+const canonical = site.origin && !noindex ? new URL(pagePath, site.origin).href : '';
+const socialOrigin = site.origin || generator.previewOrigin;
+const image = id === 'sports'
+  ? {path:'/images/iptv-usa-8k-sports.webp',width:1200,height:675,alt:'IPTV USA 8K illustrative football, basketball and baseball artwork'}
+  : id === 'vod'
+    ? {path:'/images/iptv-usa-8k-cinema.webp',width:1200,height:675,alt:'IPTV USA 8K illustrative movie and series artwork'}
+    : {path:'/images/iptv-usa-8k-dashboard.webp',width:1600,height:900,alt:'IPTV USA 8K illustrative live TV, sports and entertainment artwork'};
+const socialImage = new URL(image.path, socialOrigin).href;
+const organizationId = `${site.origin}/#organization`;
+const websiteId = `${site.origin}/#website`;
+const pageId = `${canonical || pagePath}#webpage`;
+const articleId = `${canonical || pagePath}#article`;
+const imageId = `${canonical || pagePath}#primaryimage`;
+const serviceId = `${site.origin}/#service`;
+const hasVisibleImage = root || ['home','channels','sports','vod','about'].includes(id);
+const hasService = Boolean(canonical) && ['home','plans','trial'].includes(id);
+const guide = isArticle ? guides.find(item=>item.id===id)?.[lang] : null;
+const breadcrumbLabel = guide?.eyebrow || (['channels','sports','vod'].includes(id) ? (lang==='fr'?'Catalogue IPTV':'IPTV catalogue') : ({plans:t.nav[0],devices:t.nav[1],guides:t.nav[2],trial:lang==='fr'?'Essai':'Trial',contact:t.contact,faq:'FAQ',about:t.legal[0],privacy:t.legal[1],terms:t.legal[2]})[id]);
+const breadcrumbItems = canonical && !root && !['home','404'].includes(id) ? [
+  {name:t.home,item:new URL(href('home',lang),site.origin).href},
+  ...(isArticle ? [{name:lang==='fr'?'Guides':'Guides',item:new URL(href('guides',lang),site.origin).href}] : []),
+  {name:breadcrumbLabel || title.split('|')[0].trim(),item:canonical}
+] : [];
+const pageType = id==='faq' ? 'FAQPage' : id==='contact' ? 'ContactPage' : id==='about' ? 'AboutPage' : id==='guides' ? 'CollectionPage' : 'WebPage';
+const graph = [
+  { '@type':'Organization', '@id':organizationId, name:site.name, contactPoint:{'@type':'ContactPoint',contactType:'customer support',telephone:`+${site.phone || generator.sharedSupportNumber}`,availableLanguage:['English'],url:generatorSupportUrl(lang)}, ...(site.origin ? {url:`${site.origin}/`,logo:{'@type':'ImageObject',url:`${site.origin}${site.logo.path}`,contentUrl:`${site.origin}${site.logo.path}`,width:site.logo.width,height:site.logo.height}} : {}) },
+  { '@type':'WebSite', '@id':websiteId, name:site.name, ...(site.origin ? {alternateName:new URL(site.origin).hostname,url:`${site.origin}/`} : {}), inLanguage:['en-US'], publisher:{'@id':organizationId} },
+  { '@type':pageType, '@id':pageId, name:title, description, inLanguage:root?['en-US']:'en-US', isPartOf:{'@id':websiteId}, publisher:{'@id':organizationId},
+    ...(canonical ? {url:canonical} : {}),
+    ...(hasVisibleImage ? {primaryImageOfPage:{'@id':imageId}} : {}),
+    ...(breadcrumbItems.length ? {breadcrumb:{'@id':`${canonical}#breadcrumb`}} : {}),
+    ...(isArticle ? {mainEntity:{'@id':articleId}} : {}),
+    ...(hasService ? {mainEntity:{'@id':serviceId}} : {}),
+    ...(id==='faq' ? {mainEntity:getQuestions(lang).map(question=>({'@type':'Question','@id':`${canonical || pagePath}#${question.id}`,name:question.q,acceptedAnswer:{'@type':'Answer',text:question.a}}))} : {})
+  },
+  ...(hasVisibleImage ? [{'@type':'ImageObject','@id':imageId,url:socialImage,contentUrl:socialImage,width:image.width,height:image.height,caption:image.alt}] : []),
+  ...(isArticle ? [{'@type':'Article','@id':articleId,headline:searchMeta[id][lang].h1,description,inLanguage:'en-US',mainEntityOfPage:{'@id':pageId},isPartOf:{'@id':websiteId},author:{'@id':organizationId},publisher:{'@id':organizationId},dateModified:site.updated,...(canonical?{url:canonical}:{})}] : []),
+  ...(hasService ? [{'@type':'Service','@id':serviceId,name:site.name,serviceType:lang==='fr'?'Essai IPTV et demande de devis d’abonnement':'IPTV trials and subscription quote requests',description:lang==='fr'?'Générez un essai à renouveler chaque jour et demandez un devis en USD selon la durée et les écrans souhaités. L’équipe confirme la disponibilité et les conditions sur WhatsApp.':'Generate a trial with daily renewal and request a USD quote for your preferred duration and screens. The team confirms availability and terms on WhatsApp.',url:new URL(href('plans',lang),site.origin).href,provider:{'@id':organizationId},areaServed:{'@type':'Country',name:'United States'},availableChannel:{'@type':'ServiceChannel',serviceUrl:new URL(href('contact',lang),site.origin).href,availableLanguage:['English']}}] : []),
+  ...(breadcrumbItems.length ? [{'@type':'BreadcrumbList','@id':`${canonical}#breadcrumb`,itemListElement:breadcrumbItems.map((item,index)=>({'@type':'ListItem',position:index+1,...item}))}] : [])
+];
+---
+<!doctype html>
+<html lang={'en-US'}>
+  <head>
+    <meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>{title}</title><meta name="description" content={description}/>
+    <meta name="robots" content={site.indexable && !noindex ? 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1' : 'noindex,follow'}/>
+    {canonical && <link rel="canonical" href={canonical}/>}
+
+    <link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96"/>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any"/>
+    <meta name="theme-color" content="#a93232"/>
+    <meta property="og:site_name" content={site.name}/><meta property="og:title" content={title}/><meta property="og:description" content={description}/>
+    <meta property="og:type" content={isArticle ? 'article' : 'website'}/><meta property="og:locale" content="en_US"/>
+    {canonical && <meta property="og:url" content={canonical}/>}
+    <meta property="og:image" content={socialImage}/><meta property="og:image:secure_url" content={socialImage}/><meta property="og:image:type" content="image/webp"/><meta property="og:image:width" content={String(image.width)}/><meta property="og:image:height" content={String(image.height)}/><meta property="og:image:alt" content={image.alt}/>
+    <meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content={title}/><meta name="twitter:description" content={description}/><meta name="twitter:image" content={socialImage}/><meta name="twitter:image:alt" content={image.alt}/>
+    {isArticle && <meta property="article:modified_time" content={site.updated}/>}
+    <script type="application/ld+json" set:html={JSON.stringify({'@context':'https://schema.org','@graph':graph}).replace(/</g,'\\u003c')}/>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{t.skip}</a>
+    <header class="header">
+      <a class="logo-link" href={href('home',lang)} aria-label={`${site.name} — ${t.home}`}><Brand/></a>
+      <nav class="desktop-nav" aria-label={lang === 'fr' ? 'Navigation principale' : 'Main navigation'}>
+        {navigation.map(([key,label])=><a href={href(key,lang)} aria-current={id === key ? 'page' : undefined}>{label}</a>)}
+      </nav>
+      <div class="header-actions"><a class="button button-small header-cta" href={generatorUrl(lang)} data-open-trial>{lang==='fr'?'Générer un essai gratuit':'Generate free trial'}<span aria-hidden="true">↗</span></a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label={lang === 'fr' ? 'Ouvrir le menu' : 'Open menu'}><span></span><span></span></button>
+      </div>
+    </header>
+    <nav id="mobile-nav" class="mobile-nav" aria-label={lang === 'fr' ? 'Navigation mobile' : 'Mobile navigation'} hidden>{[...navigation,['sports',lang==='fr'?'Sports en direct':'Live sports'],['vod',lang==='fr'?'Films et séries':'Movies & series'],['trial',lang==='fr'?'Essai gratuit':'Free trial'],['faq','FAQ'],['contact',t.contact]].map(([key,label])=><a href={href(key,lang)}>{label}</a>)}</nav>
+    <main id="main"><slot/></main>
+    <footer class="footer">
+      <div class="wrap footer-top"><div class="footer-brand"><a href={href('home',lang)} aria-label={site.name}><Brand/></a><p>{t.footer}</p><span class="footer-status"><i></i>{site.indexable ? 'United States · English' : t.prelaunch}</span></div>
+        <div><h2>{t.footerNav}</h2>{[['plans',t.nav[0]],['devices',t.nav[1]],['guides',t.nav[2]],['iptv-cost-usa',lang==='fr'?'Prix IPTV USA':'IPTV USA costs'],['iptv-setup-usa',lang==='fr'?'Installation IPTV':'IPTV setup'],['trial',lang==='fr'?'Essai IPTV gratuit':'Free IPTV trial'],['contact',t.contact]].map(([key,label])=><a href={href(key,lang)}>{label}</a>)}<a href={generatorSupportUrl(lang)} target="_blank" rel="noopener noreferrer">{lang==='fr'?'Support WhatsApp':'WhatsApp support'} ↗</a></div>
+        <div><h2>{t.footerInfo}</h2>{['about','privacy','terms'].map((key,i)=><a href={href(key,lang)}>{t.legal[i]}</a>)}<a href={href('faq',lang)}>{lang==='fr'?'Questions et réponses IPTV':'IPTV questions & answers'}</a><a href={href('french-tv-usa',lang)}>{lang==='fr'?'IPTV Québec et télé en français':'Spanish IPTV in the USA'}</a></div>
+      </div>
+      <div class="wrap markets"><div><h2>{t.footerMarkets}</h2><p>{t.marketsDesc}</p></div><div class="market-links">{site.markets.map(m=><a href={m.url}>{m.name}<span aria-hidden="true">↗</span></a>)}</div></div>
+      <div class="wrap footer-bottom"><span>© {new Date().getUTCFullYear()} {site.name}</span><span>United States</span><a href="#main">{lang === 'fr' ? 'Haut de page ↑' : 'Back to top ↑'}</a></div>
+    </footer>
+    <TrialGenerator lang={lang} mode="modal"/>
+    <LiveChat lang={lang}/>
+    <div class="mobile-trial-bar"><span>{lang==='fr'?'IPTV USA · Essai gratuit':'IPTV USA · Free trial'}<br/>{lang==='fr'?'Sans carte bancaire':'No payment card'}</span><a class="button" href={generatorUrl(lang)} data-open-trial>{lang==='fr'?'Générer mon essai':'Generate my trial'} →</a></div>
+    <script>
+      const toggle = document.querySelector('.menu-toggle');
+      const menu = document.querySelector('#mobile-nav');
+      toggle?.addEventListener('click', () => { const open=toggle.getAttribute('aria-expanded')==='true'; toggle.setAttribute('aria-expanded',String(!open)); menu?.toggleAttribute('hidden',open); });
+      document.addEventListener('keydown', e => { if(e.key === 'Escape') {toggle?.setAttribute('aria-expanded','false');menu?.setAttribute('hidden','');} });
+    </script>
+  </body>
+</html>

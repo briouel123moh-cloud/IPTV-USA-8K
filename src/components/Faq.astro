@@ -1,0 +1,7 @@
+---
+const { items, heading } = Astro.props;
+---
+<section class="faq-section wrap section">
+  <div><span class="eyebrow">FAQ</span><h2>{heading}</h2></div>
+  <div class="faq-list">{items.map((item) => <details><summary><h3>{item.q}</h3><span aria-hidden="true">+</span></summary><p>{item.a}</p></details>)}</div>
+</section>
