@@ -20,7 +20,7 @@ Locally use Node 22.23.4 or newer. Run `npm ci`, `npm run build`, then `npm test
 
 ## Production configuration
 
-Production uses `PUBLIC_SITE_URL=https://iptv-usa-8k.com` and `PUBLIC_INDEXABLE=true`; preview builds remain `PUBLIC_INDEXABLE=false`. Run the build, tests and launch gate with the same production variables: `PUBLIC_SITE_URL=https://iptv-usa-8k.com PUBLIC_INDEXABLE=true npm run check`, then the same variables with `npm run check:launch`. The trial profile includes apex and www origins with apex first for privacy links. The sitemap index is https://iptv-usa-8k.com/sitemap-index.xml.
+Production uses `PUBLIC_SITE_URL=https://iptv-usa-8k.com` and `PUBLIC_INDEXABLE=true`; preview builds remain `PUBLIC_INDEXABLE=false`. These variables are maintained in `wrangler.jsonc`, the source of truth for Pages builds; dashboard variables alone are insufficient while that file is present. Run the build, tests and launch gate with the same production variables: `PUBLIC_SITE_URL=https://iptv-usa-8k.com PUBLIC_INDEXABLE=true npm run check`, then the same variables with `npm run check:launch`. The trial profile includes apex and www origins with apex first for privacy links. The sitemap index is https://iptv-usa-8k.com/sitemap-index.xml.
 
 Indexable builds emit 21 canonical sitemap URLs with real page images and maintained modification dates. Preview builds emit no indexable sitemap entries. There are no claimed rankings, indexing deadlines, fabricated reviews or special AI-visibility guarantees.
 

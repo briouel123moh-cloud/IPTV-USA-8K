@@ -2,5 +2,19 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "iptv-usa-8k",
   "pages_build_output_dir": "dist",
-  "compatibility_date": "2026-11-01"
+  "compatibility_date": "2026-11-01",
+  "vars": {
+    "NODE_VERSION": "24",
+    "PUBLIC_SITE_URL": "https://iptv-usa-8k.com",
+    "PUBLIC_INDEXABLE": "true"
+  },
+  "env": {
+    "preview": {
+      "vars": {
+        "NODE_VERSION": "24",
+        "PUBLIC_SITE_URL": "https://iptv-usa-8k.com",
+        "PUBLIC_INDEXABLE": "false"
+      }
+    }
+  }
 }
