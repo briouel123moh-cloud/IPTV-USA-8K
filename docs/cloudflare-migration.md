@@ -7,7 +7,7 @@ Verified November 1, 2026.
 - GitHub: https://github.com/briouel123moh-cloud/IPTV-USA-8K
 - Public website: https://iptv-usa-8k.pages.dev/
 - Cloudflare Pages project: `iptv-usa-8k`, BRIOUEL123MOH account.
-- Production branch: `main`, automatic production deployment enabled.
+- Production branch: `main`; automatic production deployment is configured, but the GitHub event connection is not active (see below).
 - Build: `npm run build`, output `dist`, Node 24.
 - Initial complete source commit: `b27009f900e1e0df0d932c39ebf4ee50cd85528a`.
 - Initial successful Git deployment: `99d054f9-ef83-46f7-8175-25ea828b1485`; clone, build and deploy stages succeeded at 19:50 UTC.
@@ -40,3 +40,9 @@ The website is publicly accessible without login. `PUBLIC_INDEXABLE=false` delib
 Once the owned domain is connected, follow the README's domain launch steps: update canonical origin, trial origin and privacy destination; enable indexing; rebuild; run the launch gate; verify redirects and trial embedding. Indexable builds generate 21 canonical sitemap URLs. No ranking position or indexing deadline is guaranteed.
 
 No provider secrets, customer records, authentication tokens or local environment files are included in source or deployed assets.
+
+## Continuous deployment limitation
+
+The first deployment was explicitly triggered through the Pages API and successfully cloned this GitHub repository. A subsequent documentation commit did not trigger a deployment. GitHub's repository settings list the Codex Connector and Vercel apps, but no Cloudflare app. Therefore the configured automatic-deployment flag is not evidence of working push-triggered deployment.
+
+The public site is published. Subsequent updates require explicitly triggering the Pages Git build until the Cloudflare GitHub app is connected. No new app permissions, authentication credentials or deployment hooks were granted as part of this check.

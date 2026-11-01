@@ -12,7 +12,9 @@ The Cloudflare review is publicly accessible. It remains noindex pending an owne
 
 ## Build and publish
 
-Cloudflare is connected directly to this GitHub repository. Changes to `main` automatically trigger production builds with Node 24, build command `npm run build` and output directory `dist`. The initial Git build succeeded on November 1, 2026.
+Cloudflare builds directly from this GitHub repository using branch `main`, Node 24, build command `npm run build` and output directory `dist`. The initial Git build succeeded on November 1, 2026.
+
+The Pages automatic-deployment flag is enabled, but push-triggered deployment is not active: the repository's installed-apps screen does not list Cloudflare, and the verification commit did not trigger a build. Until the Cloudflare GitHub app is connected, explicitly trigger a Pages deployment of the current `main` revision after updates. The current public website has already been deployed successfully; this limitation affects subsequent unattended updates.
 
 Locally use Node 22.23.4 or newer. Run `npm ci`, `npm run build`, then `npm test`. The root `404.html` is retained so unknown paths return 404 instead of the homepage. Never commit credentials; `wrangler.jsonc` contains no secrets.
 
