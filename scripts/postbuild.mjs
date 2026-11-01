@@ -19,6 +19,10 @@ const headers=`/*
   X-Frame-Options: SAMEORIGIN
   Permissions-Policy: camera=(), microphone=(), geolocation=()
 ${site.indexable?'':'  X-Robots-Tag: noindex, follow\n'}
+https://iptv-usa-8k.pages.dev/*
+  X-Robots-Tag: noindex, follow
+https://:preview.iptv-usa-8k.pages.dev/*
+  X-Robots-Tag: noindex, follow
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
 /images/*

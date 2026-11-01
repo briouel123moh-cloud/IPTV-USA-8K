@@ -13,6 +13,12 @@ const decode=s=>s.replaceAll('&amp;','&').replaceAll('&quot;','"').replaceAll('&
 const attr=(tag,name)=>decode(tag.match(new RegExp(`\\b${name}="([^"]*)"`))?.[1]||'');
 const tags=(html,tag)=>[...html.matchAll(new RegExp(`<${tag}\\b[^>]*>`,'g'))].map(m=>m[0]);
 const pages=await Promise.all(routes.map(async r=>({...r,html:await readFile(`dist${r.path}index.html`,'utf8')})));
+test('Pages aliases stay noindex without blocking the owned production domain',async()=>{
+ const headers=await readFile('dist/_headers','utf8');
+ for(const host of ['https://iptv-usa-8k.pages.dev/*','https://:preview.iptv-usa-8k.pages.dev/*']) assert.ok(headers.includes(`${host}\n  X-Robots-Tag: noindex, follow`));
+ const globalBlock=headers.split('\nhttps://')[0];
+ assert.equal(globalBlock.includes('X-Robots-Tag: noindex'),!site.indexable);
+});
 test('21 distinct US pages export to the intended clean URLs',()=>{assert.equal(pages.length,21);assert.equal(new Set(routes.map(r=>r.path)).size,21);assert.equal(href('home'),'/');assert.equal(href('trial'),'/free-trial/');assert.equal(href('french-tv-usa'),'/spanish-iptv-usa/');});
 test('all US pages have unique descriptive metadata and one H1',()=>{const titleSet=new Set(),descSet=new Set();for(const p of pages){const title=p.html.match(/<title>(.*?)<\/title>/s)?.[1];const desc=attr(tags(p.html,'meta').find(t=>attr(t,'name')==='description')||'','content');assert.ok(title?.length>=15,p.path);assert.ok(desc.length>=70&&desc.length<=180,p.path);assert.equal(tags(p.html,'h1').length,1,p.path);assert.ok(!titleSet.has(title),p.path);assert.ok(!descSet.has(desc),p.path);titleSet.add(title);descSet.add(desc);}});
 test('identity and locale are consistent and Cloudflare preview pages stay noindex',()=>{for(const p of pages){assert.match(p.html,/<html lang="en-US"/);assert.match(p.html,/IPTV USA 8K/);const body=(p.html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)?.[1]||p.html).replace(/<script\b[^>]*>[\s\S]*?<\/script>/g,'');assert.doesNotMatch(body,/Maple\s*Stream|Québec|Ontario|Toronto|CANADA|French IPTV|English \/ Français|English or French|in Quebec/i,p.path);const robots=tags(p.html,'meta').find(t=>attr(t,'name')==='robots');assert.match(attr(robots,'content'),site.indexable?/index,follow/:/noindex/);assert.equal(attr(tags(p.html,'link').find(t=>attr(t,'rel')==='canonical'),'href'),site.origin+p.path);assert.equal(tags(p.html,'link').filter(t=>attr(t,'hreflang')).length,0);}});

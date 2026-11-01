@@ -3,7 +3,7 @@ export const generator = Object.freeze({
   origin: 'https://control.emeraldiptv.irish',
   siteId: 'usa',
   profileName: 'IPTV USA 8K',
-  productionOrigin: 'https://iptv-usa-8k.pages.dev',
+  productionOrigin: 'https://iptv-usa-8k.com',
   previewOrigin: 'https://iptv-usa-8k.pages.dev',
   sharedSupportNumber: '212631479723',
   registered: true
