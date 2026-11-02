@@ -1,4 +1,5 @@
 ---
+import { imageFor } from '../data/artwork.mjs';
 import { catalog } from '../data/catalog';
 import type { CatalogId, CatalogLocale } from '../data/catalog';
 import { href } from '../data/routes.mjs';
@@ -7,9 +8,10 @@ interface Props { id: CatalogId; lang: CatalogLocale }
 const { id, lang } = Astro.props;
 const page = catalog[id][lang];
 const fr = lang === 'fr';
+const picture = imageFor(id === 'sports' ? 'sports' : id === 'vod' ? 'cinema' : 'dashboard', lang);
 ---
 <div class="wrap catalog-content">
-  <figure class="catalog-visual"><img src={id==='sports'?'/images/iptv-usa-8k-sports.webp':id==='vod'?'/images/iptv-usa-8k-cinema.webp':'/images/iptv-usa-8k-dashboard.webp'} width={id==='channels'?1600:1200} height={id==='channels'?900:675} alt={fr?'Montage promotionnel IPTV USA 8K de chaînes américaines, de sports et de cinéma':'IPTV USA 8K promotional collage of American channels, sports and cinema'} loading="lazy"/><figcaption>{fr?'Visuel promotionnel illustratif. Chaînes et titres selon disponibilité; vérifiez pendant votre essai.':'Illustrative promotional artwork. Channels and titles are subject to availability; check during your trial.'}</figcaption></figure>
+  <figure class="catalog-visual"><img src={picture.path} width={picture.width} height={picture.height} alt={picture.alt} title={picture.title} loading="lazy"/><figcaption>{fr?'Visuel promotionnel illustratif. Chaînes et titres selon disponibilité; vérifiez pendant votre essai.':'Illustrative promotional artwork. Channels and titles are subject to availability; check during your trial.'}</figcaption></figure>
   <div class="catalog-start">
     <ul class="catalog-highlights" aria-label={fr ? 'Sur cette page' : 'On this page'}>
       {page.highlights.map(text => <li><span aria-hidden="true">✓</span>{text}</li>)}

@@ -1,4 +1,5 @@
 ---
+import { imageFor } from '../data/artwork.mjs';
 import { copy } from '../data/copy';
 import { searchMeta } from '../data/search-meta.mjs';
 import { href } from '../data/routes.mjs';
@@ -12,6 +13,7 @@ import SevenDayTrial from './SevenDayTrial.astro';
 const lang = 'en';
 const t = copy.en;
 const trial = generatorUrl(lang);
+const hero = imageFor('dashboard', lang);
 const heading = searchMeta.home.en.h1;
 const divider = heading.indexOf(':');
 const topic = divider >= 0 ? heading.slice(0, divider + 1) : 'IPTV USA';
@@ -38,7 +40,7 @@ const steps = [
         </div>
         <div class="usa-hero-visual">
           <div class="usa-screen-top"><span><i aria-hidden="true"></i> IPTV USA 8K</span><span>YOUR TV. YOUR WAY.</span></div>
-          <figure class="usa-promo-art"><img src="/images/iptv-usa-8k-dashboard.webp" srcset="/images/iptv-usa-8k-dashboard-800.webp 800w, /images/iptv-usa-8k-dashboard.webp 1600w" sizes="(max-width: 900px) 100vw, 700px" width="1600" height="900" fetchpriority="high" alt="IPTV USA 8K promotional artwork featuring US television, sports, movies and series"/><figcaption>Illustrative artwork. Check specific channels and titles during your trial.</figcaption></figure>
+          <figure class="usa-promo-art"><img src="/images/iptv-usa-8k-dashboard.webp" srcset="/images/iptv-usa-8k-dashboard-800.webp 800w, /images/iptv-usa-8k-dashboard.webp 1600w" sizes="(max-width: 900px) 100vw, 700px" width="1600" height="900" fetchpriority="high" alt={hero.alt} title={hero.title}/><figcaption>Illustrative artwork. Check specific channels and titles during your trial.</figcaption></figure>
           <div class="usa-screen-bottom"><span>LIVE TV</span><span>SPORTS</span><span>MOVIES + SERIES</span><a href={href('channels',lang)}>Build your watchlist <span aria-hidden="true">↗</span></a></div>
         </div>
       </div>

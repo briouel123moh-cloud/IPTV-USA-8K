@@ -1,4 +1,5 @@
 ---
+import { imageFor } from '../data/artwork.mjs';
 import { site } from '../data/site.mjs';
 import { href } from '../data/routes.mjs';
 import { copy } from '../data/copy';
@@ -17,11 +18,7 @@ const navigation = [ ['plans',t.nav[0]], ['channels',lang==='fr'?'Chaînes':'Cha
 const pagePath = id === '404' ? '/404.html' : href(id, lang);
 const canonical = site.origin && !noindex ? new URL(pagePath, site.origin).href : '';
 const socialOrigin = site.origin || generator.previewOrigin;
-const image = id === 'sports'
-  ? {path:'/images/iptv-usa-8k-sports.webp',width:1200,height:675,alt:'IPTV USA 8K illustrative football, basketball and baseball artwork'}
-  : id === 'vod'
-    ? {path:'/images/iptv-usa-8k-cinema.webp',width:1200,height:675,alt:'IPTV USA 8K illustrative movie and series artwork'}
-    : {path:'/images/iptv-usa-8k-dashboard.webp',width:1600,height:900,alt:'IPTV USA 8K illustrative live TV, sports and entertainment artwork'};
+const image = imageFor(id === 'sports' ? 'sports' : id === 'vod' ? 'cinema' : 'dashboard', lang);
 const socialImage = new URL(image.path, socialOrigin).href;
 const organizationId = `${site.origin}/#organization`;
 const websiteId = `${site.origin}/#website`;

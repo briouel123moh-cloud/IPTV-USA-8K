@@ -28,6 +28,6 @@ Indexable builds emit 21 canonical sitemap URLs with real page images and mainta
 
 The existing shared activation service is `https://control.emeraldiptv.irish/widget?site=usa&lang=en`. The owned USA domain is registered as its primary origin; historical preview origins remain allowed. Provider credentials stay on its Worker. One new request is allowed after 24 hours, up to 7 in 30 days, with provider-defined expiry for each credential; this is not one continuous seven-day login. Limits are shared across network sites. No real trial was issued during QA.
 
-Regional links include Belgium, Canada, Emerald, Ireland Subscription and Suomi. Emerald itself remains inbound-only.
+The USA regional footer links to Canada, Belgium, Ireland Subscription, Suomi, Nordic IPTV Elite, Australia, Deutschland and Switzerland. Emerald receives promotional links only from Suomi, Ireland Subscription and Nordic IPTV Elite.
 
 Research: `docs/us-keyword-research.md` and `docs/market-opportunities.md`. Keyword priorities are qualitative; no measured volume, KD or CPC is claimed.

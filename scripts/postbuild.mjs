@@ -1,4 +1,4 @@
-import {mkdir,readFile,writeFile} from 'node:fs/promises';
+import {mkdir,readdir,readFile,writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {site} from '../src/data/site.mjs';
 import {routes} from '../src/data/routes.mjs';
@@ -34,5 +34,15 @@ https://:preview.iptv-usa-8k.pages.dev/*
 /sitemap-index.xml
   Content-Type: application/xml; charset=utf-8
 `;
-await Promise.all([writeFile(resolve(output,'robots.txt'),robots),writeFile(resolve(output,'sitemap.xml'),sitemap),writeFile(resolve(output,'sitemap-index.xml'),index),writeFile(resolve(output,'_headers'),headers)]);
+// Exempt only real public assets, so a guessed asset path cannot reveal a storefront 404 page.
+const assetPaths = (await readdir(output, { recursive: true }))
+  .filter(path => /\.(?:css|js|mjs|webp|png|jpg|jpeg|svg|ico|woff2?|webmanifest)$/i.test(path))
+  .map(path => '/' + path.split('\\').join('/'))
+  .sort();
+const functionRoutes = {
+  version: 1,
+  include: ['/*'],
+  exclude: ['/robots.txt', '/sitemap.xml', '/sitemap-index.xml', '/.well-known/acme-challenge/*', ...assetPaths],
+};
+await Promise.all([writeFile(resolve(output,'robots.txt'),robots),writeFile(resolve(output,'sitemap.xml'),sitemap),writeFile(resolve(output,'sitemap-index.xml'),index),writeFile(resolve(output,'_headers'),headers),writeFile(resolve(output,'_routes.json'), JSON.stringify(functionRoutes))]);
 console.log(`SEO output: ${entries.length} sitemap URLs; ${site.indexable?'indexable production':'noindex review site'}.`);

@@ -34,11 +34,14 @@ export const site = {
   // Do not publish unsupported USD prices or screen entitlements.
   plans: planDurations.map(months => ({ months, usd: null, screens: null })),
   markets: [
+    { name: 'IPTV Canada 8K', region: 'Canada', url: 'https://iptv-canada-8k.com/en/' },
     { name: 'IPTV Belgium 8K', region: 'Belgium', url: 'https://iptv-belgique-8k.com' },
-    { name: 'IPTV Canada 8K', region: 'Canada', url: 'https://iptv-canada-8k.com' },
-    { name: 'Emerald IPTV', region: 'Ireland', url: 'https://emeraldiptv.irish' },
     { name: 'IPTV Ireland Subscription', region: 'Ireland', url: 'https://iptv-ireland-subscription.com' },
-    { name: 'IPTV Suomi', region: 'Finland', url: 'https://iptv-suomi-iptv.fi' }
+    { name: 'IPTV Suomi', region: 'Finland', url: 'https://iptv-suomi-iptv.fi' },
+    { name: 'Nordic IPTV Elite', region: 'Nordics', url: 'https://www.nordiciptv-elite.com/iptv-nordic-2026/' },
+    { name: 'IPTV Australia 8K', region: 'Australia', url: 'https://iptv-australia-8k.pages.dev/' },
+    { name: 'IPTV Deutschland 8K', region: 'Germany', url: 'https://iptv-deutschland-8k.pages.dev/' },
+    { name: 'IPTV Schweiz 8K', region: 'Switzerland', url: 'https://iptv-schweiz-8k.pages.dev/' }
   ]
 };
 if (process.env.PUBLIC_INDEXABLE === 'true' && !origin) throw new Error('An owned production domain is required before indexing.');

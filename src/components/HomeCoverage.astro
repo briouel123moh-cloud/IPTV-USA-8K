@@ -1,19 +1,14 @@
 ---
+import { imageFor } from '../data/artwork.mjs';
 import { homeSections } from '../data/home-sections';
 import { href } from '../data/routes.mjs';
 import { generatorUrl } from '../data/generator.mjs';
 const { lang = 'en' } = Astro.props;
 const fr = false;
 const sections = homeSections.en;
-const artwork: Record<string, { src: string; width: number; height: number; alt: string }> = {
-  'iptv-usa-vod': {
-    src: '/images/iptv-usa-8k-cinema.webp', width: 1200, height: 675,
-    alt: 'IPTV USA 8K promotional artwork for movies, series and home entertainment',
-  },
-  'iptv-usa-sports': {
-    src: '/images/iptv-usa-8k-sports.webp', width: 1200, height: 675,
-    alt: 'IPTV USA 8K promotional artwork for American football, basketball, baseball and live sports',
-  },
+const artwork: Record<string, ReturnType<typeof imageFor>> = {
+  'iptv-usa-vod': imageFor('cinema', lang),
+  'iptv-usa-sports': imageFor('sports', lang),
 };
 const comparisonSections = new Set(['iptv-vs-cable-usa', 'iptv-usa-setup', 'iptv-usa-multiple-devices']);
 const splitSections = new Set(['spanish-iptv-usa', 'iptv-usa-subscriptions']);
@@ -32,13 +27,13 @@ const tableLabels = (id: string) => {
     return (
       <section id={section.id} class:list={['coverage-section', section.tone && `coverage-${section.tone}`, { 'coverage-media': picture, 'coverage-split': splitSections.has(section.id), 'coverage-comparison': isComparison }]} aria-labelledby={`${section.id}-heading`}>
         <div class="wrap coverage-wrap">
-          {picture && pictureFirst && <figure class="coverage-picture coverage-picture-first"><img src={picture.src} width={picture.width} height={picture.height} loading="lazy" decoding="async" alt={picture.alt}/><figcaption>{fr ? 'Visuel illustratif · Chaînes et événements à vérifier pendant votre essai' : 'Illustrative artwork · Check channels and events during your trial'}</figcaption></figure>}
+          {picture && pictureFirst && <figure class="coverage-picture coverage-picture-first"><img src={picture.path} width={picture.width} height={picture.height} loading="lazy" decoding="async" alt={picture.alt} title={picture.title}/><figcaption>{fr ? 'Visuel illustratif · Chaînes et événements à vérifier pendant votre essai' : 'Illustrative artwork · Check channels and events during your trial'}</figcaption></figure>}
           <div class="coverage-editorial">
             <header class="coverage-heading">
               <h2 id={`${section.id}-heading`}>{section.heading}</h2>
               <p>{section.intro}</p>
             </header>
-            {picture && !pictureFirst && <figure class="coverage-picture"><img src={picture.src} width={picture.width} height={picture.height} loading="lazy" decoding="async" alt={picture.alt}/><figcaption>{fr ? 'Visuel illustratif · Disponibilité à vérifier pendant votre essai' : 'Illustrative artwork · Check availability during your trial'}</figcaption></figure>}
+            {picture && !pictureFirst && <figure class="coverage-picture"><img src={picture.path} width={picture.width} height={picture.height} loading="lazy" decoding="async" alt={picture.alt} title={picture.title}/><figcaption>{fr ? 'Visuel illustratif · Disponibilité à vérifier pendant votre essai' : 'Illustrative artwork · Check availability during your trial'}</figcaption></figure>}
             {isComparison ? (
               <table class="coverage-table" role="table">
                 <caption class="coverage-sr-only">{section.heading}</caption>
