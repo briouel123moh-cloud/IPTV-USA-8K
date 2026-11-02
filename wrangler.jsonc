@@ -5,6 +5,7 @@
   "compatibility_date": "2026-11-01",
   "vars": {
     "NODE_VERSION": "24",
+    "OWNER_ACCESS_AUD": "961f7e22b8a3ce1b474d3a9a7f94eaed2965a7021393017a267a96233793dfe3",
     "PUBLIC_SITE_URL": "https://iptv-usa-8k.com",
     "PUBLIC_INDEXABLE": "true"
   },
