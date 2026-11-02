@@ -12,5 +12,6 @@
     "check": "npm run build && npm test",
     "check:launch": "node scripts/check-launch.mjs"
   },
-  "dependencies": { "astro": "7.4.2" }
+  "dependencies": { "astro": "7.4.2" },
+  "devDependencies": { "miniflare": "4.20260730.0" }
 }
